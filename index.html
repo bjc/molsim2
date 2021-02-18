@@ -68,6 +68,22 @@
               the selected nucleotide.</li>
           </ul>
         </li>
+
+        <li id='amino-acid-select' class='step'>
+          Select the correct amino acid for the new codon.
+        </li>
+
+        <li id='mark-as-lethal'>
+          Depending on the change to the codon:
+          <ul>
+            <li>If the mutation caused a change in the amino acid being
+              coded, mark this mutation as <em>lethal</em>, and start
+              over with the genome from the previous iteration.</li>
+
+            <li>Otherwise, mark the mutation as <em>non-lethal</em>,
+              and continue with this new genome.</li>
+          </ul>
+        </li>
       </ol>
 
       <p id='print-results' class='step'>
