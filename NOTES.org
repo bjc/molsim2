@@ -48,17 +48,37 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 | STOP       | TAA TGA TAG             |
 
 #+name: aa-table-to-form
-#+begin_src elisp :var raw-data=amino-acid-to-codon range="@<<$<..@>$>" :results verbatim
+#+begin_src elisp :var raw-data=amino-acid-to-codon
   (mapcar (lambda (kvp)
             (cons (car kvp) (split-string (cadr kvp))))
           raw-data)
 #+end_src
 
 #+RESULTS: aa-table-to-form
-: (("Ala" "GCT" "GCC" "GCA" "GCG") ("Arg" "CGT" "CGC" "CGA" "CGG" "AGA" "AGG") ("Asn" "AAT" "AAC") ("Asp" "GAT" "GAC") ("Cys" "TGT" "TGC") ("Gln" "CAA" "CAG") ("Glu" "GAA" "GAG") ("Gly" "GGT" "GGC" "GGA" "GGG") ("His" "CAT" "CAC") ("Ile" "ATT" "ATC" "ATA") ("Leu" "CTT" "CTC" "CTA" "CTG" "TTA" "TTG") ("Lys" "AAA" "AAG") ("Met" "ATG") ("Phe" "TTT" "TTC") ("Pro" "CCT" "CCC" "CCA" "CCG") ("Ser" "TCT" "TCC" "TCA" "TCG" "AGT" "AGC") ("Thr" "ACT" "ACC" "ACA" "ACG") ("Trp" "TGG") ("Tyr" "TAT" "TAC") ("Val" "GTT" "GTC" "GTA" "GTG") ("STOP" "TAA" "TGA" "TAG"))
+| Ala  | GCT | GCC | GCA | GCG |     |     |
+| Arg  | CGT | CGC | CGA | CGG | AGA | AGG |
+| Asn  | AAT | AAC |     |     |     |     |
+| Asp  | GAT | GAC |     |     |     |     |
+| Cys  | TGT | TGC |     |     |     |     |
+| Gln  | CAA | CAG |     |     |     |     |
+| Glu  | GAA | GAG |     |     |     |     |
+| Gly  | GGT | GGC | GGA | GGG |     |     |
+| His  | CAT | CAC |     |     |     |     |
+| Ile  | ATT | ATC | ATA |     |     |     |
+| Leu  | CTT | CTC | CTA | CTG | TTA | TTG |
+| Lys  | AAA | AAG |     |     |     |     |
+| Met  | ATG |     |     |     |     |     |
+| Phe  | TTT | TTC |     |     |     |     |
+| Pro  | CCT | CCC | CCA | CCG |     |     |
+| Ser  | TCT | TCC | TCA | TCG | AGT | AGC |
+| Thr  | ACT | ACC | ACA | ACG |     |     |
+| Trp  | TGG |     |     |     |     |     |
+| Tyr  | TAT | TAC |     |     |     |     |
+| Val  | GTT | GTC | GTA | GTG |     |     |
+| STOP | TAA | TGA | TAG |     |     |     |
 
 #+name: aa-table-inverted
-#+begin_src elisp :var raw-data=amino-acid-to-codon range="@<<$<..@>$>"
+#+begin_src elisp :var raw-data=amino-acid-to-codon
   (let ((codon-alist (mapcar (lambda (aa-to-codons) (cons (cdr aa-to-codons) (car aa-to-codons)))
                              <<aa-table-to-form>>)))
     (apply 'append
@@ -73,7 +93,7 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 : ((GCT . Ala) (GCC . Ala) (GCA . Ala) (GCG . Ala) (CGT . Arg) (CGC . Arg) (CGA . Arg) (CGG . Arg) (AGA . Arg) (AGG . Arg) (AAT . Asn) (AAC . Asn) (GAT . Asp) (GAC . Asp) (TGT . Cys) (TGC . Cys) (CAA . Gln) (CAG . Gln) (GAA . Glu) (GAG . Glu) (GGT . Gly) (GGC . Gly) (GGA . Gly) (GGG . Gly) (CAT . His) (CAC . His) (ATT . Ile) (ATC . Ile) (ATA . Ile) (CTT . Leu) (CTC . Leu) (CTA . Leu) (CTG . Leu) (TTA . Leu) (TTG . Leu) (AAA . Lys) (AAG . Lys) (ATG . Met) (TTT . Phe) (TTC . Phe) (CCT . Pro) (CCC . Pro) (CCA . Pro) (CCG . Pro) (TCT . Ser) (TCC . Ser) (TCA . Ser) (TCG . Ser) (AGT . Ser) (AGC . Ser) (ACT . Thr) (ACC . Thr) (ACA . Thr) (ACG . Thr) (TGG . Trp) (TAT . Tyr) (TAC . Tyr) (GTT . Val) (GTC . Val) (GTA . Val) (GTG . Val) (TAA . STOP) (TGA . STOP) (TAG . STOP))
 
 #+name: tbl-to-json
-#+begin_src elisp :var raw-data=amino-acid-to-codon range="@<<$<..@>$>"
+#+begin_src elisp :var raw-data=amino-acid-to-codon
   (let ((json-map (mapcar (lambda (kvp) (format "'%s': '%s'," (car kvp) (cdr kvp)))
                           <<aa-table-inverted>>)))
             (format "{\n%s\n}" (string-join json-map "\n")))
@@ -81,72 +101,72 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 
 #+RESULTS: tbl-to-json
 #+begin_example
-  {
-  'GCT': 'Ala',
-  'GCC': 'Ala',
-  'GCA': 'Ala',
-  'GCG': 'Ala',
-  'CGT': 'Arg',
-  'CGC': 'Arg',
-  'CGA': 'Arg',
-  'CGG': 'Arg',
-  'AGA': 'Arg',
-  'AGG': 'Arg',
-  'AAT': 'Asn',
-  'AAC': 'Asn',
-  'GAT': 'Asp',
-  'GAC': 'Asp',
-  'TGT': 'Cys',
-  'TGC': 'Cys',
-  'CAA': 'Gln',
-  'CAG': 'Gln',
-  'GAA': 'Glu',
-  'GAG': 'Glu',
-  'GGT': 'Gly',
-  'GGC': 'Gly',
-  'GGA': 'Gly',
-  'GGG': 'Gly',
-  'CAT': 'His',
-  'CAC': 'His',
-  'ATT': 'Ile',
-  'ATC': 'Ile',
-  'ATA': 'Ile',
-  'CTT': 'Leu',
-  'CTC': 'Leu',
-  'CTA': 'Leu',
-  'CTG': 'Leu',
-  'TTA': 'Leu',
-  'TTG': 'Leu',
-  'AAA': 'Lys',
-  'AAG': 'Lys',
-  'ATG': 'Met',
-  'TTT': 'Phe',
-  'TTC': 'Phe',
-  'CCT': 'Pro',
-  'CCC': 'Pro',
-  'CCA': 'Pro',
-  'CCG': 'Pro',
-  'TCT': 'Ser',
-  'TCC': 'Ser',
-  'TCA': 'Ser',
-  'TCG': 'Ser',
-  'AGT': 'Ser',
-  'AGC': 'Ser',
-  'ACT': 'Thr',
-  'ACC': 'Thr',
-  'ACA': 'Thr',
-  'ACG': 'Thr',
-  'TGG': 'Trp',
-  'TAT': 'Tyr',
-  'TAC': 'Tyr',
-  'GTT': 'Val',
-  'GTC': 'Val',
-  'GTA': 'Val',
-  'GTG': 'Val',
-  'TAA': 'STOP',
-  'TGA': 'STOP',
-  'TAG': 'STOP',
-  }
+{
+'GCT': 'Ala',
+'GCC': 'Ala',
+'GCA': 'Ala',
+'GCG': 'Ala',
+'CGT': 'Arg',
+'CGC': 'Arg',
+'CGA': 'Arg',
+'CGG': 'Arg',
+'AGA': 'Arg',
+'AGG': 'Arg',
+'AAT': 'Asn',
+'AAC': 'Asn',
+'GAT': 'Asp',
+'GAC': 'Asp',
+'TGT': 'Cys',
+'TGC': 'Cys',
+'CAA': 'Gln',
+'CAG': 'Gln',
+'GAA': 'Glu',
+'GAG': 'Glu',
+'GGT': 'Gly',
+'GGC': 'Gly',
+'GGA': 'Gly',
+'GGG': 'Gly',
+'CAT': 'His',
+'CAC': 'His',
+'ATT': 'Ile',
+'ATC': 'Ile',
+'ATA': 'Ile',
+'CTT': 'Leu',
+'CTC': 'Leu',
+'CTA': 'Leu',
+'CTG': 'Leu',
+'TTA': 'Leu',
+'TTG': 'Leu',
+'AAA': 'Lys',
+'AAG': 'Lys',
+'ATG': 'Met',
+'TTT': 'Phe',
+'TTC': 'Phe',
+'CCT': 'Pro',
+'CCC': 'Pro',
+'CCA': 'Pro',
+'CCG': 'Pro',
+'TCT': 'Ser',
+'TCC': 'Ser',
+'TCA': 'Ser',
+'TCG': 'Ser',
+'AGT': 'Ser',
+'AGC': 'Ser',
+'ACT': 'Thr',
+'ACC': 'Thr',
+'ACA': 'Thr',
+'ACG': 'Thr',
+'TGG': 'Trp',
+'TAT': 'Tyr',
+'TAC': 'Tyr',
+'GTT': 'Val',
+'GTC': 'Val',
+'GTA': 'Val',
+'GTG': 'Val',
+'TAA': 'STOP',
+'TGA': 'STOP',
+'TAG': 'STOP',
+}
 #+end_example
 
 * work steps
