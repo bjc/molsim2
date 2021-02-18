@@ -20,7 +20,10 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 :PROPERTIES:
 :header-args: :noweb yes
 :END:
- Found [[https://en.wikipedia.org/wiki/DNA_and_RNA_codon_tables#Inverse_DNA_codon_table][on Wikipedia]]:
+
+The javascript code will be primarily concerned with translating codons into amino acids, so I want to create a javascript hash table (which is really just an object) in order to do the lookup. So first I need a table that describes those translations, which I can then manipulate in code to get the desired javascript object which maps a given codon to an amino acid.
+
+[[https://en.wikipedia.org/wiki/DNA_and_RNA_codon_tables#Inverse_DNA_codon_table][This table on Wikipedia]] is a good starting point, so I copied it into the table below. I also removed the redundancies, such as =Gln or Glu=, which had more specific definitions.
 
 #+name: amino-acid-to-codon
 | Amino acid | Codon                   |
@@ -46,6 +49,8 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 | Tyr        | TAT TAC                 |
 | Val        | GTT GTC GTA GTG         |
 | STOP       | TAA TGA TAG             |
+
+Now I take the raw table and translate it into a cons cell of ~(amino-acid . (list-of-codons))~ that is more natural in lisp. Since the =Codon= column above is a single string, I need to split it on white space into multiple codons.
 
 #+name: aa-table-to-form
 #+begin_src elisp :var raw-data=amino-acid-to-codon
@@ -77,6 +82,8 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 | Val  | GTT | GTC | GTA | GTG |     |     |
 | STOP | TAA | TGA | TAG |     |     |     |
 
+The last thing that needs to be done for usable output is changing the data from a list of ~(amino-acid . (list-of-codons))~ into ~((codon . amino-acid) (codon . amino-acid) …)~ because the final target of this manipulation is going to be a =json= object in the form ~{ codon: amino-acid }~.
+
 #+name: aa-table-inverted
 #+begin_src elisp :var raw-data=amino-acid-to-codon
   (let ((codon-alist (mapcar (lambda (aa-to-codons) (cons (cdr aa-to-codons) (car aa-to-codons)))
@@ -91,6 +98,8 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 
 #+RESULTS: aa-table-inverted
 : ((GCT . Ala) (GCC . Ala) (GCA . Ala) (GCG . Ala) (CGT . Arg) (CGC . Arg) (CGA . Arg) (CGG . Arg) (AGA . Arg) (AGG . Arg) (AAT . Asn) (AAC . Asn) (GAT . Asp) (GAC . Asp) (TGT . Cys) (TGC . Cys) (CAA . Gln) (CAG . Gln) (GAA . Glu) (GAG . Glu) (GGT . Gly) (GGC . Gly) (GGA . Gly) (GGG . Gly) (CAT . His) (CAC . His) (ATT . Ile) (ATC . Ile) (ATA . Ile) (CTT . Leu) (CTC . Leu) (CTA . Leu) (CTG . Leu) (TTA . Leu) (TTG . Leu) (AAA . Lys) (AAG . Lys) (ATG . Met) (TTT . Phe) (TTC . Phe) (CCT . Pro) (CCC . Pro) (CCA . Pro) (CCG . Pro) (TCT . Ser) (TCC . Ser) (TCA . Ser) (TCG . Ser) (AGT . Ser) (AGC . Ser) (ACT . Thr) (ACC . Thr) (ACA . Thr) (ACG . Thr) (TGG . Trp) (TAT . Tyr) (TAC . Tyr) (GTT . Val) (GTC . Val) (GTA . Val) (GTG . Val) (TAA . STOP) (TGA . STOP) (TAG . STOP))
+
+Now that the lisp data are organized correctly, it’s a simple matter of translating the =sexp= into =json= with some simple string manipulation.
 
 #+name: tbl-to-json
 #+begin_src elisp :var raw-data=amino-acid-to-codon
@@ -168,6 +177,19 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 'TAG': 'STOP',
 }
 #+end_example
+
+Finally, I need the complete amino acid list for a selector, so generate one from the initial table.
+
+#+name: tbl-to-aa-list
+#+begin_src elisp :var raw-data=amino-acid-to-codon :results raw
+  (let ((aa-strings (mapcar (lambda (aalist)
+                              (format "’%s’" (car aalist)))
+                            raw-data)))
+    (format "[%s]" (string-join aa-strings ", ")))
+#+end_src
+
+#+RESULTS: tbl-to-aa-list
+[’Ala’, ’Arg’, ’Asn’, ’Asp’, ’Cys’, ’Gln’, ’Glu’, ’Gly’, ’His’, ’Ile’, ’Leu’, ’Lys’, ’Met’, ’Phe’, ’Pro’, ’Ser’, ’Thr’, ’Trp’, ’Tyr’, ’Val’, ’STOP’]
 
 * work steps
 1. group nucleotides by codon

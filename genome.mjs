@@ -1,4 +1,4 @@
-import Nucleotide from './nucleotide.mjs'
+import Codon from './codon.mjs'
 import Die from './die.mjs'
 import { randomItem } from './utils.mjs'
 
@@ -9,17 +9,23 @@ class Genome {
         }
     }
 
-    constructor(gen) {
-        const nucleotideList = document.createElement('ol')
+    constructor(nucleotideGenerator) {
+        const codonList = document.createElement('ol')
         this._boundNucleotideClickedHandler =
             this.nucleotideClickedHandler.bind(this)
-        this.nucleotides = [...gen].map(base => {
-            const n = new Nucleotide(base)
-            n.onClick = this._boundNucleotideClickedHandler
-            nucleotideList.appendChild(n.elt)
-            return n
+
+        this.codons = []
+        let tmpCodon = []
+        nucleotideGenerator.forEach(base => {
+            tmpCodon.push(base)
+            if (tmpCodon.length == 3) {
+                const c = new Codon(...tmpCodon)
+                codonList.appendChild(c.elt)
+                this.codons.push(c)
+                tmpCodon = []
+            }
         })
-        this.elt.appendChild(nucleotideList)
+        this.elt.appendChild(codonList)
         this.lock()
     }
 
@@ -44,16 +50,16 @@ class Genome {
 
     lock() {
         this.elt.classList.add('locked')
-        this.nucleotides.forEach(n => n.lock())
+        this.codons.forEach(n => n.lock())
     }
 
     unlock() {
         this.elt.classList.remove('locked')
-        this.nucleotides.forEach(n => n.unlock())
+        this.coons.forEach(n => n.unlock())
     }
 
     clone() {
-        return new Genome(this.nucleotides.map(n => n.value))
+        return new Genome(this.codons.map(c => c.value))
     }
 
     get selectedNucleotide() {
@@ -75,6 +81,7 @@ class Genome {
 	this.selectedNucleotide = nucleotide
     }
 }
-Genome.size = 18
+// Size of the genome in codons.
+Genome.size = 6
 
 export default Genome
