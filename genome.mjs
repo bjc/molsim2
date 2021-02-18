@@ -3,12 +3,6 @@ import Die from './die.mjs'
 import { randomItem } from './utils.mjs'
 
 class Genome {
-    static *randomBase() {
-	for (const i of [...Array(Genome.size)]) {
-            yield randomItem(Nucleotide.bases)
-        }
-    }
-
     constructor(nucleotides) {
         const codonList = document.createElement('ol')
         this._boundNucleotideClickedHandler =
@@ -81,7 +75,5 @@ class Genome {
 	this.selectedNucleotide = nucleotide
     }
 }
-// Size of the genome in codons.
-Genome.size = 6
 
 export default Genome
