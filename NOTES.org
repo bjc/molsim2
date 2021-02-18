@@ -48,7 +48,7 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 | STOP       | TAA TGA TAG             |
 
 #+name: aa-table-to-form
-#+begin_src elisp :var table-name="amino-acid-to-codon" range="@<<$<..@>$>"
+#+begin_src elisp :var table-name="amino-acid-to-codon" range="@<<$<..@>$>" :results verbatim
   (let ((raw-data (org-table-get-remote-range table-name range)))
     (seq-reduce (lambda (acc elt)
                   (set-text-properties 0 (length elt) nil elt)
@@ -60,27 +60,7 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 #+end_src
 
 #+RESULTS: aa-table-to-form
-| STOP | TAA | TGA | TAG |     |     |     |
-| Val  | GTT | GTC | GTA | GTG |     |     |
-| Tyr  | TAT | TAC |     |     |     |     |
-| Trp  | TGG |     |     |     |     |     |
-| Thr  | ACT | ACC | ACA | ACG |     |     |
-| Ser  | TCT | TCC | TCA | TCG | AGT | AGC |
-| Pro  | CCT | CCC | CCA | CCG |     |     |
-| Phe  | TTT | TTC |     |     |     |     |
-| Met  | ATG |     |     |     |     |     |
-| Lys  | AAA | AAG |     |     |     |     |
-| Leu  | CTT | CTC | CTA | CTG | TTA | TTG |
-| Ile  | ATT | ATC | ATA |     |     |     |
-| His  | CAT | CAC |     |     |     |     |
-| Gly  | GGT | GGC | GGA | GGG |     |     |
-| Glu  | GAA | GAG |     |     |     |     |
-| Gln  | CAA | CAG |     |     |     |     |
-| Cys  | TGT | TGC |     |     |     |     |
-| Asp  | GAT | GAC |     |     |     |     |
-| Asn  | AAT | AAC |     |     |     |     |
-| Arg  | CGT | CGC | CGA | CGG | AGA | AGG |
-| Ala  | GCT | GCC | GCA | GCG |     |     |
+: (("STOP" "TAA" "TGA" "TAG") ("Val" "GTT" "GTC" "GTA" "GTG") ("Tyr" "TAT" "TAC") ("Trp" "TGG") ("Thr" "ACT" "ACC" "ACA" "ACG") ("Ser" "TCT" "TCC" "TCA" "TCG" "AGT" "AGC") ("Pro" "CCT" "CCC" "CCA" "CCG") ("Phe" "TTT" "TTC") ("Met" "ATG") ("Lys" "AAA" "AAG") ("Leu" "CTT" "CTC" "CTA" "CTG" "TTA" "TTG") ("Ile" "ATT" "ATC" "ATA") ("His" "CAT" "CAC") ("Gly" "GGT" "GGC" "GGA" "GGG") ("Glu" "GAA" "GAG") ("Gln" "CAA" "CAG") ("Cys" "TGT" "TGC") ("Asp" "GAT" "GAC") ("Asn" "AAT" "AAC") ("Arg" "CGT" "CGC" "CGA" "CGG" "AGA" "AGG") ("Ala" "GCT" "GCC" "GCA" "GCG"))
 
 #+name: aa-table-inverted
 #+begin_src elisp :var table-name="amino-acid-to-codon" range="@<<$<..@>$>"
@@ -175,13 +155,14 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 #+end_example
 
 * work steps
-1. Use existing infrastructure to do codon mutation, but after mutation, need a place to select/display the amino acid from the codon group.
-2. Then need to verify student amino acid selection
-3. Then have student mark lethality
-4. Then clone either current or previous genome to next genome
-5. go back to 1
-
-Additionally, every codon in the first genome must be filled in by students
+1. group nucleotides by codon
+2. add amino acid selection area to codon group
+3. fill in the first genome’s amino acids on startup
+4. Use existing infrastructure to do codon mutation, but after mutation, need a place to select/display the amino acid from the codon group.
+5. Then need to verify student amino acid selection
+6. Then have student mark lethality
+7. Then clone either current or previous genome to next genome
+8. go back to 4
 
 * Misc
 ** Cartesian product fun in lisp
