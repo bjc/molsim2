@@ -62,9 +62,9 @@ class Nucleotide {
     }
 }
 Nucleotide.transition = {'A': 'G',
-			  'C': 'T',
-			  'G': 'A',
-			  'T': 'C'}
+			 'C': 'T',
+			 'G': 'A',
+			 'T': 'C'}
 Nucleotide.complementingTransversion = {'A': 'T',
 					'C': 'G',
 					'G': 'C',
