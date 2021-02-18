@@ -25,14 +25,6 @@ class Codon {
         return this._elt
     }
 
-    get aaElt() {
-        if (this._aaElt === undefined) {
-            this._aaElt = document.createElement('div')
-            this._aaElt.classList.add('amino-acid')
-        }
-        return this._aaElt
-    }
-
     lock() {
         this.bases.forEach(n => n.lock())
         this.aminoAcid.lock()

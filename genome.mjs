@@ -9,14 +9,14 @@ class Genome {
         }
     }
 
-    constructor(nucleotideGenerator) {
+    constructor(nucleotides) {
         const codonList = document.createElement('ol')
         this._boundNucleotideClickedHandler =
             this.nucleotideClickedHandler.bind(this)
 
         this.codons = []
         let tmpCodon = []
-        nucleotideGenerator.forEach(base => {
+        nucleotides.forEach(base => {
             tmpCodon.push(base)
             if (tmpCodon.length == 3) {
                 const c = new Codon(...tmpCodon)
@@ -55,11 +55,11 @@ class Genome {
 
     unlock() {
         this.elt.classList.remove('locked')
-        this.coons.forEach(n => n.unlock())
+        this.codons.forEach(n => n.unlock())
     }
 
     clone() {
-        return new Genome(this.codons.map(c => c.value))
+        return new Genome(this.codons.flatMap(c => c.bases.map(b => b.value)))
     }
 
     get selectedNucleotide() {
