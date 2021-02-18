@@ -48,22 +48,17 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 | STOP       | TAA TGA TAG             |
 
 #+name: aa-table-to-form
-#+begin_src elisp :var table-name="amino-acid-to-codon" range="@<<$<..@>$>" :results verbatim
-  (let ((raw-data (org-table-get-remote-range table-name range)))
-    (seq-reduce (lambda (acc elt)
-                  (set-text-properties 0 (length elt) nil elt)
-                  (if (or (not acc) (cdar acc))
-                      (cons (list elt) acc)
-                    (cons (cons (caar acc) (split-string elt)) (cdr acc))))
-                raw-data
-                nil))
+#+begin_src elisp :var raw-data=amino-acid-to-codon range="@<<$<..@>$>" :results verbatim
+  (mapcar (lambda (kvp)
+            (cons (car kvp) (split-string (cadr kvp))))
+          raw-data)
 #+end_src
 
 #+RESULTS: aa-table-to-form
-: (("STOP" "TAA" "TGA" "TAG") ("Val" "GTT" "GTC" "GTA" "GTG") ("Tyr" "TAT" "TAC") ("Trp" "TGG") ("Thr" "ACT" "ACC" "ACA" "ACG") ("Ser" "TCT" "TCC" "TCA" "TCG" "AGT" "AGC") ("Pro" "CCT" "CCC" "CCA" "CCG") ("Phe" "TTT" "TTC") ("Met" "ATG") ("Lys" "AAA" "AAG") ("Leu" "CTT" "CTC" "CTA" "CTG" "TTA" "TTG") ("Ile" "ATT" "ATC" "ATA") ("His" "CAT" "CAC") ("Gly" "GGT" "GGC" "GGA" "GGG") ("Glu" "GAA" "GAG") ("Gln" "CAA" "CAG") ("Cys" "TGT" "TGC") ("Asp" "GAT" "GAC") ("Asn" "AAT" "AAC") ("Arg" "CGT" "CGC" "CGA" "CGG" "AGA" "AGG") ("Ala" "GCT" "GCC" "GCA" "GCG"))
+: (("Ala" "GCT" "GCC" "GCA" "GCG") ("Arg" "CGT" "CGC" "CGA" "CGG" "AGA" "AGG") ("Asn" "AAT" "AAC") ("Asp" "GAT" "GAC") ("Cys" "TGT" "TGC") ("Gln" "CAA" "CAG") ("Glu" "GAA" "GAG") ("Gly" "GGT" "GGC" "GGA" "GGG") ("His" "CAT" "CAC") ("Ile" "ATT" "ATC" "ATA") ("Leu" "CTT" "CTC" "CTA" "CTG" "TTA" "TTG") ("Lys" "AAA" "AAG") ("Met" "ATG") ("Phe" "TTT" "TTC") ("Pro" "CCT" "CCC" "CCA" "CCG") ("Ser" "TCT" "TCC" "TCA" "TCG" "AGT" "AGC") ("Thr" "ACT" "ACC" "ACA" "ACG") ("Trp" "TGG") ("Tyr" "TAT" "TAC") ("Val" "GTT" "GTC" "GTA" "GTG") ("STOP" "TAA" "TGA" "TAG"))
 
 #+name: aa-table-inverted
-#+begin_src elisp :var table-name="amino-acid-to-codon" range="@<<$<..@>$>"
+#+begin_src elisp :var raw-data=amino-acid-to-codon range="@<<$<..@>$>"
   (let ((codon-alist (mapcar (lambda (aa-to-codons) (cons (cdr aa-to-codons) (car aa-to-codons)))
                              <<aa-table-to-form>>)))
     (apply 'append
@@ -75,10 +70,10 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 #+end_src
 
 #+RESULTS: aa-table-inverted
-: ((TAA . STOP) (TGA . STOP) (TAG . STOP) (GTT . Val) (GTC . Val) (GTA . Val) (GTG . Val) (TAT . Tyr) (TAC . Tyr) (TGG . Trp) (ACT . Thr) (ACC . Thr) (ACA . Thr) (ACG . Thr) (TCT . Ser) (TCC . Ser) (TCA . Ser) (TCG . Ser) (AGT . Ser) (AGC . Ser) (CCT . Pro) (CCC . Pro) (CCA . Pro) (CCG . Pro) (TTT . Phe) (TTC . Phe) (ATG . Met) (AAA . Lys) (AAG . Lys) (CTT . Leu) (CTC . Leu) (CTA . Leu) (CTG . Leu) (TTA . Leu) (TTG . Leu) (ATT . Ile) (ATC . Ile) (ATA . Ile) (CAT . His) (CAC . His) (GGT . Gly) (GGC . Gly) (GGA . Gly) (GGG . Gly) (GAA . Glu) (GAG . Glu) (CAA . Gln) (CAG . Gln) (TGT . Cys) (TGC . Cys) (GAT . Asp) (GAC . Asp) (AAT . Asn) (AAC . Asn) (CGT . Arg) (CGC . Arg) (CGA . Arg) (CGG . Arg) (AGA . Arg) (AGG . Arg) (GCT . Ala) (GCC . Ala) (GCA . Ala) (GCG . Ala))
+: ((GCT . Ala) (GCC . Ala) (GCA . Ala) (GCG . Ala) (CGT . Arg) (CGC . Arg) (CGA . Arg) (CGG . Arg) (AGA . Arg) (AGG . Arg) (AAT . Asn) (AAC . Asn) (GAT . Asp) (GAC . Asp) (TGT . Cys) (TGC . Cys) (CAA . Gln) (CAG . Gln) (GAA . Glu) (GAG . Glu) (GGT . Gly) (GGC . Gly) (GGA . Gly) (GGG . Gly) (CAT . His) (CAC . His) (ATT . Ile) (ATC . Ile) (ATA . Ile) (CTT . Leu) (CTC . Leu) (CTA . Leu) (CTG . Leu) (TTA . Leu) (TTG . Leu) (AAA . Lys) (AAG . Lys) (ATG . Met) (TTT . Phe) (TTC . Phe) (CCT . Pro) (CCC . Pro) (CCA . Pro) (CCG . Pro) (TCT . Ser) (TCC . Ser) (TCA . Ser) (TCG . Ser) (AGT . Ser) (AGC . Ser) (ACT . Thr) (ACC . Thr) (ACA . Thr) (ACG . Thr) (TGG . Trp) (TAT . Tyr) (TAC . Tyr) (GTT . Val) (GTC . Val) (GTA . Val) (GTG . Val) (TAA . STOP) (TGA . STOP) (TAG . STOP))
 
 #+name: tbl-to-json
-#+begin_src elisp :var table-name="amino-acid-to-codon" range="@<<$<..@>$>"
+#+begin_src elisp :var raw-data=amino-acid-to-codon range="@<<$<..@>$>"
   (let ((json-map (mapcar (lambda (kvp) (format "'%s': '%s'," (car kvp) (cdr kvp)))
                           <<aa-table-inverted>>)))
             (format "{\n%s\n}" (string-join json-map "\n")))
@@ -87,70 +82,70 @@ Continue to mutate for 10 rounds, though not all 10 of your sequences will survi
 #+RESULTS: tbl-to-json
 #+begin_example
   {
-  'TAA': 'STOP',
-  'TGA': 'STOP',
-  'TAG': 'STOP',
-  'GTT': 'Val',
-  'GTC': 'Val',
-  'GTA': 'Val',
-  'GTG': 'Val',
-  'TAT': 'Tyr',
-  'TAC': 'Tyr',
-  'TGG': 'Trp',
-  'ACT': 'Thr',
-  'ACC': 'Thr',
-  'ACA': 'Thr',
-  'ACG': 'Thr',
-  'TCT': 'Ser',
-  'TCC': 'Ser',
-  'TCA': 'Ser',
-  'TCG': 'Ser',
-  'AGT': 'Ser',
-  'AGC': 'Ser',
-  'CCT': 'Pro',
-  'CCC': 'Pro',
-  'CCA': 'Pro',
-  'CCG': 'Pro',
-  'TTT': 'Phe',
-  'TTC': 'Phe',
-  'ATG': 'Met',
-  'AAA': 'Lys',
-  'AAG': 'Lys',
-  'CTT': 'Leu',
-  'CTC': 'Leu',
-  'CTA': 'Leu',
-  'CTG': 'Leu',
-  'TTA': 'Leu',
-  'TTG': 'Leu',
-  'ATT': 'Ile',
-  'ATC': 'Ile',
-  'ATA': 'Ile',
-  'CAT': 'His',
-  'CAC': 'His',
-  'GGT': 'Gly',
-  'GGC': 'Gly',
-  'GGA': 'Gly',
-  'GGG': 'Gly',
-  'GAA': 'Glu',
-  'GAG': 'Glu',
-  'CAA': 'Gln',
-  'CAG': 'Gln',
-  'TGT': 'Cys',
-  'TGC': 'Cys',
-  'GAT': 'Asp',
-  'GAC': 'Asp',
-  'AAT': 'Asn',
-  'AAC': 'Asn',
+  'GCT': 'Ala',
+  'GCC': 'Ala',
+  'GCA': 'Ala',
+  'GCG': 'Ala',
   'CGT': 'Arg',
   'CGC': 'Arg',
   'CGA': 'Arg',
   'CGG': 'Arg',
   'AGA': 'Arg',
   'AGG': 'Arg',
-  'GCT': 'Ala',
-  'GCC': 'Ala',
-  'GCA': 'Ala',
-  'GCG': 'Ala',
+  'AAT': 'Asn',
+  'AAC': 'Asn',
+  'GAT': 'Asp',
+  'GAC': 'Asp',
+  'TGT': 'Cys',
+  'TGC': 'Cys',
+  'CAA': 'Gln',
+  'CAG': 'Gln',
+  'GAA': 'Glu',
+  'GAG': 'Glu',
+  'GGT': 'Gly',
+  'GGC': 'Gly',
+  'GGA': 'Gly',
+  'GGG': 'Gly',
+  'CAT': 'His',
+  'CAC': 'His',
+  'ATT': 'Ile',
+  'ATC': 'Ile',
+  'ATA': 'Ile',
+  'CTT': 'Leu',
+  'CTC': 'Leu',
+  'CTA': 'Leu',
+  'CTG': 'Leu',
+  'TTA': 'Leu',
+  'TTG': 'Leu',
+  'AAA': 'Lys',
+  'AAG': 'Lys',
+  'ATG': 'Met',
+  'TTT': 'Phe',
+  'TTC': 'Phe',
+  'CCT': 'Pro',
+  'CCC': 'Pro',
+  'CCA': 'Pro',
+  'CCG': 'Pro',
+  'TCT': 'Ser',
+  'TCC': 'Ser',
+  'TCA': 'Ser',
+  'TCG': 'Ser',
+  'AGT': 'Ser',
+  'AGC': 'Ser',
+  'ACT': 'Thr',
+  'ACC': 'Thr',
+  'ACA': 'Thr',
+  'ACG': 'Thr',
+  'TGG': 'Trp',
+  'TAT': 'Tyr',
+  'TAC': 'Tyr',
+  'GTT': 'Val',
+  'GTC': 'Val',
+  'GTA': 'Val',
+  'GTG': 'Val',
+  'TAA': 'STOP',
+  'TGA': 'STOP',
+  'TAG': 'STOP',
   }
 #+end_example
 
