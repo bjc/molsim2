@@ -1,0 +1,43 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    background-color: white;
+}
+
+#instructions {
+    display: none;
+}
+
+#die {
+    display: none;
+}
+
+#errors {
+    display: none;
+}
+
+#nucleotide-selector {
+    display: none;
+}
+
+.genome>ol {
+    display: inline-flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 1ex;
+}
+
+.genome .nucleotide {
+    display: inline-flex;
+    height: 3ex;
+    width: 2em;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.genome .nucleotide.selected {
+    border: 2px solid black;
+}

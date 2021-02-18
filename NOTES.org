@@ -1,0 +1,201 @@
+#+title: Molecular Evolution Simulator for Amino Acids
+#+STARTUP: content hideblocks
+
+* Rules
+- If the nucleotide change causes an amino acid change, mark the change as lethal, and use the previous sequence for further mutations
+- if the nucleotide change doesn’t modify the amino acid, simply proceed with the change in place
+
+- Students must translate the codons to amino acids themselves (possibly only the ones changed)
+- have students mark lethality and proceed with forward movement
+- print out at the end
+
+** Text from Siobain
+#+begin_quote
+Translate your DNA sequence into amino acids.  If the mutation is synonymous (despite the mutation there is no change in amino acid), then allow the mutation to survive to all subsequent rounds of mutation.  If it is nonsynonymous, then the mutation was lethal, and you should mark the “lethal” box on the left.  Revert to the last functional sequence (the ancestral one or one that has accumulated some synonymous mutation(s)) and use that to go to the next round of mutation.
+
+Continue to mutate for 10 rounds, though not all 10 of your sequences will survive.  Then insert the pdf you get from the webpage into this word document on the next page and answer the questions about your mutated sequences.
+#+end_quote
+
+** Inverse codon table
+:PROPERTIES:
+:header-args: :noweb yes
+:END:
+ Found [[https://en.wikipedia.org/wiki/DNA_and_RNA_codon_tables#Inverse_DNA_codon_table][on Wikipedia]]:
+
+#+name: amino-acid-to-codon
+| Amino acid | Codon                   |
+|------------+-------------------------|
+| Ala        | GCT GCC GCA GCG         |
+| Arg        | CGT CGC CGA CGG AGA AGG |
+| Asn        | AAT AAC                 |
+| Asp        | GAT GAC                 |
+| Cys        | TGT TGC                 |
+| Gln        | CAA CAG                 |
+| Glu        | GAA GAG                 |
+| Gly        | GGT GGC GGA GGG         |
+| His        | CAT CAC                 |
+| Ile        | ATT ATC ATA             |
+| Leu        | CTT CTC CTA CTG TTA TTG |
+| Lys        | AAA AAG                 |
+| Met        | ATG                     |
+| Phe        | TTT TTC                 |
+| Pro        | CCT CCC CCA CCG         |
+| Ser        | TCT TCC TCA TCG AGT AGC |
+| Thr        | ACT ACC ACA ACG         |
+| Trp        | TGG                     |
+| Tyr        | TAT TAC                 |
+| Val        | GTT GTC GTA GTG         |
+| STOP       | TAA TGA TAG             |
+
+#+name: aa-table-to-form
+#+begin_src elisp :var table-name="amino-acid-to-codon" range="@<<$<..@>$>"
+  (let ((raw-data (org-table-get-remote-range table-name range)))
+    (seq-reduce (lambda (acc elt)
+                  (set-text-properties 0 (length elt) nil elt)
+                  (if (or (not acc) (cdar acc))
+                      (cons (list elt) acc)
+                    (cons (cons (caar acc) (split-string elt)) (cdr acc))))
+                raw-data
+                nil))
+#+end_src
+
+#+RESULTS: aa-table-to-form
+| STOP | TAA | TGA | TAG |     |     |     |
+| Val  | GTT | GTC | GTA | GTG |     |     |
+| Tyr  | TAT | TAC |     |     |     |     |
+| Trp  | TGG |     |     |     |     |     |
+| Thr  | ACT | ACC | ACA | ACG |     |     |
+| Ser  | TCT | TCC | TCA | TCG | AGT | AGC |
+| Pro  | CCT | CCC | CCA | CCG |     |     |
+| Phe  | TTT | TTC |     |     |     |     |
+| Met  | ATG |     |     |     |     |     |
+| Lys  | AAA | AAG |     |     |     |     |
+| Leu  | CTT | CTC | CTA | CTG | TTA | TTG |
+| Ile  | ATT | ATC | ATA |     |     |     |
+| His  | CAT | CAC |     |     |     |     |
+| Gly  | GGT | GGC | GGA | GGG |     |     |
+| Glu  | GAA | GAG |     |     |     |     |
+| Gln  | CAA | CAG |     |     |     |     |
+| Cys  | TGT | TGC |     |     |     |     |
+| Asp  | GAT | GAC |     |     |     |     |
+| Asn  | AAT | AAC |     |     |     |     |
+| Arg  | CGT | CGC | CGA | CGG | AGA | AGG |
+| Ala  | GCT | GCC | GCA | GCG |     |     |
+
+#+name: aa-table-inverted
+#+begin_src elisp :var table-name="amino-acid-to-codon" range="@<<$<..@>$>"
+  (let ((codon-alist (mapcar (lambda (aa-to-codons) (cons (cdr aa-to-codons) (car aa-to-codons)))
+                             <<aa-table-to-form>>)))
+    (apply 'append
+           (mapcar (lambda (kvp)
+                     (mapcar (lambda (codon)
+                               (cons codon (cdr kvp)))
+                             (car kvp)))
+                   codon-alist)))
+#+end_src
+
+#+RESULTS: aa-table-inverted
+: ((TAA . STOP) (TGA . STOP) (TAG . STOP) (GTT . Val) (GTC . Val) (GTA . Val) (GTG . Val) (TAT . Tyr) (TAC . Tyr) (TGG . Trp) (ACT . Thr) (ACC . Thr) (ACA . Thr) (ACG . Thr) (TCT . Ser) (TCC . Ser) (TCA . Ser) (TCG . Ser) (AGT . Ser) (AGC . Ser) (CCT . Pro) (CCC . Pro) (CCA . Pro) (CCG . Pro) (TTT . Phe) (TTC . Phe) (ATG . Met) (AAA . Lys) (AAG . Lys) (CTT . Leu) (CTC . Leu) (CTA . Leu) (CTG . Leu) (TTA . Leu) (TTG . Leu) (ATT . Ile) (ATC . Ile) (ATA . Ile) (CAT . His) (CAC . His) (GGT . Gly) (GGC . Gly) (GGA . Gly) (GGG . Gly) (GAA . Glu) (GAG . Glu) (CAA . Gln) (CAG . Gln) (TGT . Cys) (TGC . Cys) (GAT . Asp) (GAC . Asp) (AAT . Asn) (AAC . Asn) (CGT . Arg) (CGC . Arg) (CGA . Arg) (CGG . Arg) (AGA . Arg) (AGG . Arg) (GCT . Ala) (GCC . Ala) (GCA . Ala) (GCG . Ala))
+
+#+name: tbl-to-json
+#+begin_src elisp :var table-name="amino-acid-to-codon" range="@<<$<..@>$>"
+  (let ((json-map (mapcar (lambda (kvp) (format "'%s': '%s'," (car kvp) (cdr kvp)))
+                          <<aa-table-inverted>>)))
+            (format "{\n%s\n}" (string-join json-map "\n")))
+#+end_src
+
+#+RESULTS: tbl-to-json
+#+begin_example
+  {
+  'TAA': 'STOP',
+  'TGA': 'STOP',
+  'TAG': 'STOP',
+  'GTT': 'Val',
+  'GTC': 'Val',
+  'GTA': 'Val',
+  'GTG': 'Val',
+  'TAT': 'Tyr',
+  'TAC': 'Tyr',
+  'TGG': 'Trp',
+  'ACT': 'Thr',
+  'ACC': 'Thr',
+  'ACA': 'Thr',
+  'ACG': 'Thr',
+  'TCT': 'Ser',
+  'TCC': 'Ser',
+  'TCA': 'Ser',
+  'TCG': 'Ser',
+  'AGT': 'Ser',
+  'AGC': 'Ser',
+  'CCT': 'Pro',
+  'CCC': 'Pro',
+  'CCA': 'Pro',
+  'CCG': 'Pro',
+  'TTT': 'Phe',
+  'TTC': 'Phe',
+  'ATG': 'Met',
+  'AAA': 'Lys',
+  'AAG': 'Lys',
+  'CTT': 'Leu',
+  'CTC': 'Leu',
+  'CTA': 'Leu',
+  'CTG': 'Leu',
+  'TTA': 'Leu',
+  'TTG': 'Leu',
+  'ATT': 'Ile',
+  'ATC': 'Ile',
+  'ATA': 'Ile',
+  'CAT': 'His',
+  'CAC': 'His',
+  'GGT': 'Gly',
+  'GGC': 'Gly',
+  'GGA': 'Gly',
+  'GGG': 'Gly',
+  'GAA': 'Glu',
+  'GAG': 'Glu',
+  'CAA': 'Gln',
+  'CAG': 'Gln',
+  'TGT': 'Cys',
+  'TGC': 'Cys',
+  'GAT': 'Asp',
+  'GAC': 'Asp',
+  'AAT': 'Asn',
+  'AAC': 'Asn',
+  'CGT': 'Arg',
+  'CGC': 'Arg',
+  'CGA': 'Arg',
+  'CGG': 'Arg',
+  'AGA': 'Arg',
+  'AGG': 'Arg',
+  'GCT': 'Ala',
+  'GCC': 'Ala',
+  'GCA': 'Ala',
+  'GCG': 'Ala',
+  }
+#+end_example
+
+* work steps
+1. Use existing infrastructure to do codon mutation, but after mutation, need a place to select/display the amino acid from the codon group.
+2. Then need to verify student amino acid selection
+3. Then have student mark lethality
+4. Then clone either current or previous genome to next genome
+5. go back to 1
+
+Additionally, every codon in the first genome must be filled in by students
+
+* Misc
+** Cartesian product fun in lisp
+I don’t know why I did this when I knew I was just going to have to scrape a table anyway, but it was a fun exercise, and I don’t want to throw it away.
+#+BEGIN_SRC elisp
+  (let* ((builder (lambda (acc depth list)
+                    (if (= depth 0)
+                        (string-join acc)
+                      (mapcar (lambda (e)
+                                (funcall builder
+                                         (cons e acc) (1- depth) list))
+                              list))))
+         (codons (flatten-list (funcall builder nil 3 '("A" "C" "T" "G")))))
+    (string-join (mapcar (lambda (c) (format "’%s’: ," c))
+                         codons)
+                 "\n"))
+#+END_SRC

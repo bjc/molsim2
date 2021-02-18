@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport'
+          content='width=device-width, initial-scale=1.0'>
+    <title>Molecular Evolution Simulator for Amino Acids</title>
+    <link rel='shortcut icon' href='favicon.png' type='image/png'>
+    <link rel='stylesheet' href='style.css'>
+    <link rel='stylesheet' media='only screen'
+	  href='mobile.css'>
+    <link rel='stylesheet' media='only screen and (min-width: 768px)'
+	  href='tablet.css'>
+    <link rel='stylesheet' media='only screen and (min-width: 1024px)'
+	  href='desktop.css'>
+    <link rel='stylesheet' media='only print'
+	  href='print.css'>
+  </head>
+
+  <body>
+    <ol id='genome-history' start='0'>
+    </ol>
+
+    <div id='instructions'>
+      <div id='die'>
+        <div class='value'>--</div>
+        <button class='roll' disabled=''>Roll</button>
+      </div>
+
+      <span id='remaining-iterations'>--</span> more times:
+      <ol>
+        <li id='clone-nucleotide' class='step'>
+          <button id='clone' disabled=''>Clone</button> the genome to
+          start mutating it.
+        </li>
+
+        <li id='roll-for-nucleotide' class='step'>
+          Roll to find the nucleotide to mutate.
+          <ul>
+            <li>If the roll is between 1 through 18, inclusive, select
+              that nucleotide.</li>
+            <li>Otherwise, skip mutation and clone the genome
+              again.</li>
+          </ul>
+        </li>
+
+        <li id='nucleotide-select' class='step'>
+          Select the <span id='select-number'>rolled</span>
+          nucleotide in the sequence.
+        </li>
+
+        <li id='roll-for-mutation' class='step'>
+          Roll to see what kind of mutation to perform.
+        </li>
+
+        <li id='perform-mutation' class='step'>
+          Depending on the roll:
+
+          <ul>
+            <li>If the roll is between 1 through 14, inclusive, perform
+              a <em>transition</em> on the selected nucleotide.</li>
+
+            <li>If the roll is between 15 through 17, inclusive,
+              perform a <em>complementing transversion</em> on the selected
+              nucleotide to the base it pairs with.</li>
+
+            <li>Otherwise, perform the <em>other transversion</em> on
+              the selected nucleotide.</li>
+          </ul>
+        </li>
+      </ol>
+
+      <p id='print-results' class='step'>
+        <button id='print' disabled=''>Print</button> results.
+      </p>
+    </div>
+
+    <div id='errors' class='hidden'>
+      <p></p>
+      <button>OK</button>
+    </div>
+
+    <ul id='nucleotide-selector' class='hidden'>
+      <li>A</li>
+      <li>G</li>
+      <li>C</li>
+      <li>T</li>
+    </ul>
+
+    <script src='main.mjs' type='module'></script>
+  </body>
+</html>

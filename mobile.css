@@ -1,0 +1,161 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0;
+
+    background-color: #eee;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#errors {
+    position: fixed;
+    display: block;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f99;
+    border: 1px solid #922;
+}
+
+#errors p {
+    padding: 1ex 1em;
+    margin: 0;
+}
+
+#errors button {
+    display: block;
+    margin-left: auto;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+#genome-history {
+    margin: 0;
+    overflow: scroll;
+    align-self: stretch;
+    flex-basis: 50%;
+}
+
+#instructions {
+    padding: 1ex;
+    margin: 0;
+    overflow: scroll;
+    flex-basis: 50%;
+
+    background-color: #ddd;
+
+    border-style: solid;
+    border-top-width: 1px;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+}
+
+#instructions .step {
+    padding: 5px;
+}
+
+#instructions .step {
+    display: none;
+}
+
+#instructions .current {
+    background-color: yellow;
+}
+
+#instructions .step.current {
+    display: list-item;
+}
+
+#print-results.step.current {
+    display: block;
+}
+
+#die {
+    display: block;
+    float: right;
+    padding: 2ex;
+
+    background-color: #fde;
+    border: 1px solid #aaa;
+}
+
+#die .value {
+    text-align: center;
+    padding-bottom: 1ex;
+}
+
+#nucleotide-selector {
+    position: relative;
+    white-space: nowrap;
+    padding: 0;
+    word-spacing: -6px; /* TODO: 0 doesn't work. And for some reason whitespace is being renderded between <li> elements? */
+    width: 8em; /* TODO: this shouldn't be hard coded. */
+
+    background-color: ivory;
+    border: 1px solid black;
+}
+
+#nucleotide-selector,
+.genome:not(.locked) {
+    cursor: pointer;
+}
+
+#nucleotide-selector li:hover,
+.genome:not(.locked) .nucleotide:hover {
+    background-color: orange;
+}
+
+.genome .nucleotide.selected,
+.genome:not(.locked) .nucleotide.selected:hover {
+    background-color: red;
+}
+
+#nucleotide-selector li {
+    display: inline-block;
+    width: 2em;
+    flex-basis: 2em;
+    text-align: center;
+    padding-top: 1ex;
+    padding-bottom: 1ex;
+}
+
+.genome {
+    margin: 0.5ex;
+}
+
+.genome.locked {
+    cursor: text
+}
+
+.genome>ol {
+    display: inline-flex;
+    flex-wrap: wrap;
+    padding: 0;
+    border: 1px solid black;
+
+    background-color: white;
+}
+
+.genome .nucleotide {
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    font-size: 18px;
+    text-align: center;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.genome .nucleotide span {
+    display: inline-block;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
