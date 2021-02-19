@@ -1,12 +1,13 @@
 import { randomItem, ordinalSuffix } from './utils.mjs'
 import AminoAcid from './amino-acid.mjs'
 import AminoAcidSelector from './amino-acid-selector.mjs'
-import Genome from './genome.mjs'
-import Nucleotide from './nucleotide.mjs'
 import Die from './die.mjs'
-import GenomeList from './genome-list.mjs'
-import NucleotideSelector from './nucleotide-selector.mjs'
 import Error from './error.mjs'
+import Genome from './genome.mjs'
+import GenomeList from './genome-list.mjs'
+import LethalitySelector from './lethality-selector.mjs'
+import Nucleotide from './nucleotide.mjs'
+import NucleotideSelector from './nucleotide-selector.mjs'
 
 class CloneNucleotide {
     constructor(rules) {
@@ -229,29 +230,48 @@ class SelectAminoAcid {
         }
 
         const newAminoAcid = new AminoAcid(...this.codon.value.split(''))
-        window.aa = newAminoAcid
-        console.debug('new:', newAminoAcid)
+        const isLethal = this.codon.aminoAcid.value !== newAminoAcid.value
         this.codon.aminoAcid = newAminoAcid
-        this.rules.next(new MarkAsLethal(this.rules))
+        this.rules.next(new MarkAsLethal(this.rules, isLethal))
     }
 }
 
 class MarkAsLethal {
-    constructor(rules) {
+    constructor(rules, isLethal) {
         this.rules = rules
+        this.isLethal = isLethal
 
         this.id = 'mark-as-lethal'
     }
 
     enter() {
-        // Enable lethal/non-lethal selector.
-
-        // Attach validator to selector and change state if possible.
+        this.rules.lethalitySelector.onItemSelected = this.handleItemSelected.bind(this)
+        this.rules.lethalitySelector.attach()
     }
 
     exit() {
-        // Disable lethal/non-lethal selector.
+        this.rules.lethalitySelector.detach()
+    }
 
+    get lethalHTML() {
+        return 'A change in amino acid is a <em>lethal</em> change.'
+    }
+    
+    get nonLethalHTML() {
+        return 'A change in amino acid is a <em>lethal</em> change.'
+    }
+    
+    handleItemSelected(isLethal) {
+        if (isLethal !== this.isLethal) {
+            if (this.isLethal) {
+                this.rules.error.innerHTML = this.lethalHTML
+            } else {
+                this.rules.error.innerHTML = this.nonLethalHTML
+            }
+            this.rules.next(new ShowError(this.rules, this))
+            return
+        }
+        
         this.rules.iterations--
         if (this.rules.isLastIteration) {
             this.rules.next(new DoNothing(this.rules))
@@ -308,12 +328,13 @@ class ShowError {
 }
 
 class Rules {
-    constructor(die, instructions, genomeList, aminoAcidSelector, nucleotideSelector, cloneButton, remainingIterations, printButton, errors) {
+    constructor(die, instructions, genomeList, aminoAcidSelector, nucleotideSelector, lethalitySelector, cloneButton, remainingIterations, printButton, errors) {
         this.die = new Die(die)
         this.instructions = instructions
         this.genomeList = new GenomeList(genomeList)
         this.aminoAcidSelector = new AminoAcidSelector(aminoAcidSelector)
         this.nucleotideSelector = new NucleotideSelector(nucleotideSelector)
+        this.lethalitySelector = new LethalitySelector(lethalitySelector)
         this.cloneButton = cloneButton
         this.remainingIterations = remainingIterations
         this.printButton = printButton
@@ -327,8 +348,10 @@ class Rules {
             this._debugStartAtRollForMutation()
         } else if (false) {
             this._debugStartAtPerformMutation(3)
-        } else if (true) {
+        } else if (false) {
             this._debugStartAtSelectAminoAcid()
+        } else if (true) {
+            this._debugStartAtSelectLethality()
         } else if (false) {
             this._debugStartWithError()
         } else {
@@ -385,6 +408,17 @@ class Rules {
         const nucleotide = this.currentGenome.nucleotides[15]
         nucleotide.value = 'A'
         this.currentGenome.selectedNucleotide = nucleotide
+    }
+
+    _debugStartAtSelectLethality() {
+        this.genomeList.push(this.currentGenome.clone())
+
+        this.currentState = new MarkAsLethal(this, true)
+        this.die.value = 15
+        const nucleotide = this.currentGenome.nucleotides[15]
+        nucleotide.value = 'A'
+        this.currentGenome.selectedNucleotide = nucleotide
+        this.currentGenome.codons[5].aminoAcid = new AminoAcid('A', 'C', 'T')
     }
 
     _debugStartWithError() {
