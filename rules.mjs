@@ -73,8 +73,13 @@ class NucleotideSelect {
             return
         }
 
-        this.rules.genomeList.push(this.rules.currentGenome.clone())
-        this.rules.next(new RollForNucleotide(this.rules))
+        this.rules.iterations--
+        if (this.rules.iterations === 0) {
+            this.rules.next(new PrintResults(this.rules))
+        } else {
+            this.rules.genomeList.push(this.rules.currentGenome.clone())
+            this.rules.next(new RollForNucleotide(this.rules))
+        }
     }
 
     handleSelectionChanged(nucleotide, i) {
@@ -126,6 +131,7 @@ class PerformMutation {
         this.rules = rules
 
         this.id = 'perform-mutation'
+        this.originalGenome = this.rules.currentGenome.clone()
     }
 
     enter() {
@@ -183,13 +189,15 @@ class PerformMutation {
             return
         }
 
-        this.rules.next(new SelectAminoAcid(this.rules))
+        this.selectedNucleotide.value = base
+        this.rules.next(new SelectAminoAcid(this.rules, this.originalGenome))
     }
 }
 
 class SelectAminoAcid {
-    constructor(rules) {
+    constructor(rules, originalGenome) {
         this.rules = rules
+        this.originalGenome = originalGenome
 
         this.id ='amino-acid-select'
     }
@@ -199,6 +207,7 @@ class SelectAminoAcid {
         const selector = this.rules.aminoAcidSelector
         this.codon = this.rules.currentGenome.selectedCodon
         this.expected = AminoAcid.codonMap[this.codon.value]
+        console.debug('expected: ', this.expected)
         let x = selector.elt.querySelector('#amino-acid-selector .codon').innerHTML =
             this.codon.value
 
@@ -227,13 +236,14 @@ class SelectAminoAcid {
         const newAminoAcid = new AminoAcid(...this.codon.value.split(''))
         const isLethal = this.codon.aminoAcid.value !== newAminoAcid.value
         this.codon.aminoAcid = newAminoAcid
-        this.rules.next(new MarkAsLethal(this.rules, isLethal))
+        this.rules.next(new MarkAsLethal(this.rules, this.originalGenome, isLethal))
     }
 }
 
 class MarkAsLethal {
-    constructor(rules, isLethal) {
+    constructor(rules, originalGenome, isLethal) {
         this.rules = rules
+        this.originalGenome = originalGenome
         this.isLethal = isLethal
 
         this.id = 'mark-as-lethal'
@@ -288,7 +298,7 @@ class MarkAsLethal {
             this.rules.next(new ShowError(this.rules, this))
             return
         }
-        this.nextGoodState(this.rules.previousGenome)
+        this.nextGoodState(this.originalGenome)
     }
 
     nextGoodState(genome) {
@@ -421,7 +431,7 @@ class Rules {
     }
 
     _debugStartAtSelectLethality() {
-        this.currentState = new MarkAsLethal(this, true)
+        this.currentState = new MarkAsLethal(this, this.currentGenome.clone(), true)
         this.die.value = 15
         const nucleotide = this.currentGenome.nucleotides[15]
         nucleotide.value = 'A'
@@ -436,10 +446,6 @@ class Rules {
 
     get currentGenome() {
         return this.genomeList.last
-    }
-
-    get previousGenome() {
-        return this.genomeList.penultimate
     }
 
     showCurrent() {

@@ -18,14 +18,6 @@ class GenomeList {
 	    return undefined
 	}
     }
-
-    get penultimate() {
-        if (this.genomes.length > 1) {
-            return this.genomes[this.genomes.length - 2]
-        } else {
-            return undefined
-        }
-    }
 }
 
 export default GenomeList
