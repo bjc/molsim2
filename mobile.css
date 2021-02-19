@@ -112,6 +112,53 @@ body {
     background-color: orange;
 }
 
+#amino-acid-selector {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 50%;
+    transform: translate(-50%, -50%);
+
+    background-color: ivory;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+#amino-acid-selector p {
+    margin: 0;
+    padding: 10px;
+
+    border-bottom: 1px dashed black;
+}
+
+#amino-acid-selector .codon {
+    font-weight: bold;
+}
+
+#amino-acid-selector ul {
+    display: flex;
+    flex-wrap: wrap;
+
+    margin: 0;
+    padding: 10px;
+
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#amino-acid-selector li {
+    display: flex-inline;
+
+    height: 3ex;
+    width: 3em;
+
+    text-align: center;
+}
+
+#amino-acid-selector li:hover {
+    background-color: orange;
+}
+
 .genome .nucleotide.selected,
 .genome:not(.locked) .nucleotide.selected:hover {
     background-color: red;

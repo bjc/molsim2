@@ -81,6 +81,7 @@ class Genome {
         for (const c of this.codons) {
             for (const b of c.bases) {
                 if (b === this._selectedNucleotide) {
+                    this.selectedCodon = c
 	            this.onNucleotideSelectionChanged(this._selectedNucleotide, i)
                     return
                 }

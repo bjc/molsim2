@@ -25,6 +25,10 @@ class Codon {
         return this._elt
     }
 
+    get value() {
+        return this.bases.map(b => b.value).join('')
+    }
+
     lock() {
         this.bases.forEach(n => n.lock())
         this.aminoAcid.lock()

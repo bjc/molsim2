@@ -1,4 +1,6 @@
 import { randomItem, ordinalSuffix } from './utils.mjs'
+import AminoAcid from './amino-acid.mjs'
+import AminoAcidSelector from './amino-acid-selector.mjs'
 import Genome from './genome.mjs'
 import Nucleotide from './nucleotide.mjs'
 import Die from './die.mjs'
@@ -184,7 +186,67 @@ class PerformMutation {
             return
         }
 
-        this.selectedNucleotide.value = base
+        this.rules.next(new SelectAminoAcid(this.rules))
+    }
+}
+
+class SelectAminoAcid {
+    constructor(rules) {
+        this.rules = rules
+
+        this.id ='amino-acid-select'
+    }
+
+    enter() {
+        const selector = this.rules.aminoAcidSelector
+        this.codon = this.rules.currentGenome.selectedCodon.value
+        this.expected = AminoAcid.codonMap[this.codon]
+        let x = selector.elt.querySelector('#amino-acid-selector .codon').innerHTML =
+            this.codon
+
+        selector.onItemSelected = this.handleItemSelected.bind(this)
+        selector.attach(this.selectedNucleotide)
+
+        this.rules.aminoAcidSelector.attach()
+    }
+
+    exit() {
+        this.rules.aminoAcidSelector.detach()
+    }
+
+    validSelection(aminoAcid) {
+        console.debug('aa:', this.expected)
+        return aminoAcid == this.expected
+    }
+
+    handleItemSelected(aminoAcid) {
+        console.debug('selected', aminoAcid)
+        if (!this.validSelection(aminoAcid)) {
+            this.rules.error.innerHTML =
+                `The codon ${this.codon} does not code for ${aminoAcid}`
+            this.rules.next(new ShowError(this.rules, this))
+            return
+        }
+        this.rules.next(new MarkAsLethal(this.rules))
+    }
+}
+
+class MarkAsLethal {
+    constructor(rules) {
+        this.rules = rules
+
+        this.id = 'mark-as-lethal'
+    }
+
+    enter() {
+        // Enable lethal/non-lethal selector.
+
+        // Attach validator to selector and change state if possible.
+    }
+
+    exit() {
+        // Disable lethal/non-lethal selector.
+
         this.rules.iterations--
         if (this.rules.isLastIteration) {
             this.rules.next(new DoNothing(this.rules))
@@ -241,10 +303,11 @@ class ShowError {
 }
 
 class Rules {
-    constructor(die, instructions, genomeList, nucleotideSelector, cloneButton, remainingIterations, printButton, errors) {
+    constructor(die, instructions, genomeList, aminoAcidSelector, nucleotideSelector, cloneButton, remainingIterations, printButton, errors) {
         this.die = new Die(die)
         this.instructions = instructions
         this.genomeList = new GenomeList(genomeList)
+        this.aminoAcidSelector = new AminoAcidSelector(aminoAcidSelector)
         this.nucleotideSelector = new NucleotideSelector(nucleotideSelector)
         this.cloneButton = cloneButton
         this.remainingIterations = remainingIterations
@@ -259,6 +322,8 @@ class Rules {
             this._debugStartAtRollForMutation()
         } else if (false) {
             this._debugStartAtPerformMutation(4)
+        } else if (true) {
+            this._debugStartAtSelectAminoAcid()
         } else if (false) {
             this._debugStartWithError()
         } else {
@@ -298,6 +363,14 @@ class Rules {
         this.currentState = new PerformMutation(this)
         this.die.value = 15
         const nucleotide = this.currentGenome.nucleotides[15]
+        this.currentGenome.selectedNucleotide = nucleotide
+    }
+
+    _debugStartAtSelectAminoAcid() {
+        this.currentState = new SelectAminoAcid(this)
+        this.die.value = 15
+        const nucleotide = this.currentGenome.nucleotides[15]
+        nucleotide.value = 'A'
         this.currentGenome.selectedNucleotide = nucleotide
     }
 
