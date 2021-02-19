@@ -43,6 +43,12 @@ class Genome {
         }, [])
     }
 
+    get length() {
+        return this.codons.reduce((acc, c) => {
+            return acc + c.bases.length
+        }, 0)
+    }
+
     get onNucleotideSelectionChanged() {
         if (this._onNucleotideSelectionChanged !== undefined) {
             return this._onNucleotideSelectionChanged
