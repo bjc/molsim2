@@ -38,7 +38,9 @@ class Genome {
     }
 
     get nucleotides() {
-        return this.codons.flatMap(c => c.bases)
+        return this.codons.reduce((acc, c) => {
+            return acc.concat(c.bases)
+        }, [])
     }
 
     get onNucleotideSelectionChanged() {
@@ -63,7 +65,7 @@ class Genome {
     }
 
     clone() {
-        return new Genome(this.codons.flatMap(c => c.bases.map(b => b.value)))
+        return new Genome(this.nucleotides.map(n => n.value))
     }
 
     get selectedNucleotide() {
