@@ -173,8 +173,15 @@ body {
     padding-bottom: 1ex;
 }
 
-.genome {
-    margin: 0.5ex;
+#lethality-selector {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    padding: 10px;
+    background-color: ivory;
+    border: 1px solid black;
 }
 
 .genome>ol {
