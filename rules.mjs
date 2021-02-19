@@ -66,10 +66,9 @@ class NucleotideSelect {
 
     handleClone(evt) {
         window.r = this.rules
-        console.debug('clone', this.rules.die.value, this.rules.currentGenome.length)
-        if (this.rules.die.value < this.rules.currentGenome.length) {
+        if (this.rules.die.value <= this.rules.currentGenome.length) {
             this.rules.error.innerHTML =
-                `TODO: this should have been a selection operation`
+                `Select the ${this.ordinalFor(this.rules.die.value)} nucleotide.`
             this.rules.next(new ShowError(this.rules, this))
             return
         }
@@ -82,16 +81,20 @@ class NucleotideSelect {
         i++;
         if (this.rules.die.value > this.rules.currentGenome.length) {
             this.rules.error.innerHTML =
-                `TODO: this should have been a clone operation`
+                `You need to <em>clone</em> this nucleotide.`
             this.rules.next(new ShowError(this.rules, this))
             return
         } else if (i != this.rules.die.value) {
             this.rules.error.innerHTML =
-                `You selected the ${i}<sup>${ordinalSuffix(i)}</sup> nucleotide. Please select the ${this.want}<sup>${ordinalSuffix(this.want)}</sup> one.`
+                `You selected the ${this.ordinalFor(i)} nucleotide. Please select the ${this.ordinalFor(this.want)} one.`
             this.rules.next(new ShowError(this.rules, this))
             return
         }
         this.rules.next(new RollForMutation(this.rules))
+    }
+
+    ordinalFor(i) {
+        return `${i}<sup>${ordinalSuffix(i)}</sup>`
     }
 }
 
