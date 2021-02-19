@@ -187,7 +187,7 @@ body {
 
 .genome .codon {
     display: inline-block;
-    margin: 0 0.5ex;
+    margin: 5px;
     border: 1px solid black;
 
     background-color: white;
