@@ -4,7 +4,6 @@ import Nucleotide from './nucleotide.mjs'
 class Codon {
     constructor(n1, n2, n3) {
         this.bases = [n1, n2, n3]
-        this.aminoAcid = new AminoAcid(n1, n2, n3)
 
         const nucleotideList = document.createElement('ol')
         this.bases = [n1, n2, n3].map(base => {
@@ -14,7 +13,8 @@ class Codon {
             return n
         })
         this.elt.appendChild(nucleotideList)
-        this.elt.appendChild(this.aminoAcid.elt)
+
+        this.aminoAcid = new AminoAcid(n1, n2, n3)
     }
 
     get elt() {
@@ -27,6 +27,19 @@ class Codon {
 
     get value() {
         return this.bases.map(b => b.value).join('')
+    }
+
+    get aminoAcid() {
+        return this._aminoAcid
+    }
+
+    set aminoAcid(value) {
+        this._aminoAcid = value
+        const oldElt = this.elt.querySelector('.amino-acid')
+        if (oldElt) {
+            this.elt.removeChild(oldElt)
+        }
+        this.elt.appendChild(value.elt)
     }
 
     lock() {

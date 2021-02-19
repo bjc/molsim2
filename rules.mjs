@@ -198,11 +198,12 @@ class SelectAminoAcid {
     }
 
     enter() {
+        window.t = this
         const selector = this.rules.aminoAcidSelector
-        this.codon = this.rules.currentGenome.selectedCodon.value
-        this.expected = AminoAcid.codonMap[this.codon]
+        this.codon = this.rules.currentGenome.selectedCodon
+        this.expected = AminoAcid.codonMap[this.codon.value]
         let x = selector.elt.querySelector('#amino-acid-selector .codon').innerHTML =
-            this.codon
+            this.codon.value
 
         selector.onItemSelected = this.handleItemSelected.bind(this)
         selector.attach(this.selectedNucleotide)
@@ -215,18 +216,22 @@ class SelectAminoAcid {
     }
 
     validSelection(aminoAcid) {
-        console.debug('aa:', this.expected)
+        console.debug('aminoAcid:', aminoAcid, 'expected: ', this.expected)
         return aminoAcid == this.expected
     }
 
     handleItemSelected(aminoAcid) {
-        console.debug('selected', aminoAcid)
         if (!this.validSelection(aminoAcid)) {
             this.rules.error.innerHTML =
-                `The codon ${this.codon} does not code for ${aminoAcid}`
+                `The codon ${this.codon.value} does not code for ${aminoAcid}`
             this.rules.next(new ShowError(this.rules, this))
             return
         }
+
+        const newAminoAcid = new AminoAcid(...this.codon.value.split(''))
+        window.aa = newAminoAcid
+        console.debug('new:', newAminoAcid)
+        this.codon.aminoAcid = newAminoAcid
         this.rules.next(new MarkAsLethal(this.rules))
     }
 }
@@ -321,7 +326,7 @@ class Rules {
         if (false) {
             this._debugStartAtRollForMutation()
         } else if (false) {
-            this._debugStartAtPerformMutation(4)
+            this._debugStartAtPerformMutation(3)
         } else if (true) {
             this._debugStartAtSelectAminoAcid()
         } else if (false) {
@@ -345,18 +350,24 @@ class Rules {
     }
 
     _debugStartAtRollForMutation() {
+        this.genomeList.push(this.currentGenome.clone())
+
         this.currentState = new RollForMutation(this)
         const nucleotide = this.currentGenome.nucleotides[2]
         this.currentGenome.selectedNucleotide = nucleotide
     }
 
     _debugStartAtPerformMutation(n) {
+        // The semicolon below is necessary to prevent the array
+        // expansion below it from being understood as an index
+        // operation.
+        this.genomeList.push(this.currentGenome.clone());
+
         [...Array(n)].forEach(i => {
             const n = randomItem(this.currentGenome.nucleotides)
             n.value = randomItem(Nucleotide.bases)
             this.currentGenome.selectedNucleotide = n
             const g = this.currentGenome.clone()
-            window.g = g
             this.genomeList.push(g)
         })
 
@@ -367,6 +378,8 @@ class Rules {
     }
 
     _debugStartAtSelectAminoAcid() {
+        this.genomeList.push(this.currentGenome.clone())
+
         this.currentState = new SelectAminoAcid(this)
         this.die.value = 15
         const nucleotide = this.currentGenome.nucleotides[15]
