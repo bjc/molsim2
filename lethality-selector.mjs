@@ -27,7 +27,8 @@ class LethalitySelector {
     }
 
     select(evt) {
-	this.onItemSelected(evt.originalTarget.id == 'lethal')
+        window.evt = evt
+	this.onItemSelected(evt.target.id == 'lethal')
     }
 }
 
