@@ -37,10 +37,10 @@ class NucleotideSelect {
 
         this.id = 'nucleotide-select'
         this._boundCloneHandler = this.handleClone.bind(this)
+        this.cloneButtons = document.querySelectorAll(`#${this.id} .clone`)
     }
 
     enter() {
-        this.cloneButtons = document.querySelectorAll(`#${this.id} .clone`)
         this.cloneButtons.forEach(button => {
             button.addEventListener('click', this._boundCloneHandler)
             button.disabled = false
@@ -210,7 +210,6 @@ class SelectAminoAcid {
     }
 
     validSelection(aminoAcid) {
-        console.debug('aminoAcid:', aminoAcid, 'expected: ', this.expected)
         return aminoAcid == this.expected
     }
 
@@ -235,12 +234,32 @@ class MarkAsLethal {
         this.isLethal = isLethal
 
         this.id = 'mark-as-lethal'
+        this._boundCloneHandler = this.handleClone.bind(this)
+        this._boundKillHandler = this.handleKill.bind(this)
+        this.cloneButtons = document.querySelectorAll(`#${this.id} .clone`)
+        this.killButtons = document.querySelectorAll(`#${this.id} .kill`)
     }
 
     enter() {
+        this.cloneButtons.forEach(button => {
+            button.addEventListener('click', this._boundCloneHandler)
+            button.disabled = false
+        })
+        this.killButtons.forEach(button => {
+            button.addEventListener('click', this._boundKillHandler)
+            button.disabled = false
+        })
     }
 
     exit() {
+        this.cloneButtons.forEach(button => {
+            button.removeEventListener('click', this._boundCloneHandler)
+            button.disabled = true
+        })
+        this.killButtons.forEach(button => {
+            button.removeEventListener('click', this._boundKillHandler)
+            button.disabled = true
+        })
     }
 
     get lethalHTML() {
@@ -248,11 +267,39 @@ class MarkAsLethal {
     }
     
     get nonLethalHTML() {
-        return 'A change in amino acid is a <em>lethal</em> change.'
+        return 'If the amino acid doesn\'t change it is <em>non-lethal<em>.'
+    }
+
+    handleClone(evt) {
+        if (this.isLethal) {
+            this.rules.error.innerHTML = this.lethalHTML
+            this.rules.next(new ShowError(this.rules, this))
+            return
+        }
+        this.nextGoodState(this.rules.currentGenome)
+    }
+
+    handleKill(evt) {
+        if (!this.isLethal) {
+            this.rules.error.innerHTML = this.nonLethalHTML
+            this.rules.next(new ShowError(this.rules, this))
+            return
+        }
+        this.nextGoodState(this.rules.previousGenome)
+    }
+
+    nextGoodState(genome) {
+        this.rules.iterations--
+        if (this.rules.iterations === 0) {
+            this.rules.next(new PrintResults(this.rules))
+        } else {
+            this.rules.genomeList.push(genome.clone())
+            this.rules.next(new RollForNucleotide(this.rules))
+        }
     }
 }
 
-class DoNothing {
+class PrintResults {
     constructor(rules) {
         this.rules = rules
 
@@ -319,7 +366,7 @@ class Rules {
             this._debugStartAtPerformMutation(3)
         } else if (false) {
             this._debugStartAtSelectAminoAcid()
-        } else if (false) {
+        } else if (true) {
             this._debugStartAtSelectLethality()
         } else if (false) {
             this._debugStartWithError()
@@ -386,6 +433,10 @@ class Rules {
 
     get currentGenome() {
         return this.genomeList.last
+    }
+
+    get previousGenome() {
+        return this.genomeList.penultimate
     }
 
     showCurrent() {
