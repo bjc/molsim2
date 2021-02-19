@@ -29,24 +29,20 @@
 
       <span id='remaining-iterations'>--</span> more times:
       <ol>
-        <li id='clone-nucleotide' class='step'>
-          <button id='clone' disabled=''>Clone</button> the genome to
-          start mutating it.
-        </li>
-
         <li id='roll-for-nucleotide' class='step'>
           Roll to find the nucleotide to mutate.
-          <ul>
-            <li>If the roll is between 1 through 18, inclusive, select
-              that nucleotide.</li>
-            <li>Otherwise, skip mutation and clone the genome
-              again.</li>
-          </ul>
         </li>
 
         <li id='nucleotide-select' class='step'>
-          Select the <span id='select-number'>rolled</span>
-          nucleotide in the sequence.
+          Depending on the roll:
+
+          <ul>
+            <li>If the roll is between 1 through 18, inclusive, select
+              that nucleotide.</li>
+            <li>Otherwise, skip mutation and
+              <button class='clone' disabled=''>clone</button> the
+              genome again.</li>
+          </ul>
         </li>
 
         <li id='roll-for-mutation' class='step'>
@@ -76,12 +72,12 @@
         <li id='mark-as-lethal'>
           Depending on the change to the codon:
           <ul>
-            <li>If the mutation caused a change in the amino acid being
-              coded, mark this mutation as <em>lethal</em>, and start
-              over with the genome from the previous iteration.</li>
+            <li>If the mutation caused a change in the amino acid
+              being coded, then <button id='kill' disabled=''>kill</button> it and
+              start again with the previous generation.</li>
 
-            <li>Otherwise, mark the mutation as <em>non-lethal</em>,
-              and continue with this new genome.</li>
+            <li>Otherwise, <button id='clone' disabled=''>clone</button> this
+              genome for the next generation.</li>
           </ul>
         </li>
       </ol>
@@ -128,11 +124,6 @@
         <li>Val</li>
         <li>STOP</li>
       </ul>
-    </div>
-
-    <div id='lethality-selector' class='hidden'>
-      <button id='lethal'>Lethal</button>
-      <button id='non-lethal'>Non-lethal</button>
     </div>
 
     <script src='main.mjs' type='module'></script>

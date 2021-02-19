@@ -5,36 +5,8 @@ import Die from './die.mjs'
 import Error from './error.mjs'
 import Genome from './genome.mjs'
 import GenomeList from './genome-list.mjs'
-import LethalitySelector from './lethality-selector.mjs'
 import Nucleotide from './nucleotide.mjs'
 import NucleotideSelector from './nucleotide-selector.mjs'
-
-class CloneNucleotide {
-    constructor(rules) {
-        this.rules = rules
-
-        this.id = 'clone-nucleotide'
-        this._boundClickHandler = this.clickHandler.bind(this)
-    }
-
-    enter() {
-        this.rules.cloneButton.addEventListener('click',
-                                                this._boundClickHandler)
-        this.rules.cloneButton.disabled = false
-    }
-
-    exit() {
-        this.rules.cloneButton.removeEventListener('click',
-                                                   this._boundClickHandler)
-        this.rules.cloneButton.disabled = true
-    }
-
-    clickHandler(evt) {
-        const genome = this.rules.currentGenome.clone()
-        this.rules.genomeList.push(genome)
-        this.rules.next(new RollForNucleotide(this.rules))
-    }
-}
 
 class RollForNucleotide {
     constructor(rules) {
@@ -55,16 +27,7 @@ class RollForNucleotide {
     }
 
     handleDieRoll() {
-        if (this.rules.die.value > Rules.initialGenomeBases.length) {
-            this.rules.iterations--
-            if (this.rules.isLastIteration) {
-                this.rules.next(new DoNothing(this.rules))
-            } else {
-                this.rules.next(new CloneNucleotide(this.rules))
-            }
-        } else {
-            this.rules.next(new NucleotideSelect(this.rules))
-        }
+        this.rules.next(new NucleotideSelect(this.rules))
     }
 }
 
@@ -73,26 +36,56 @@ class NucleotideSelect {
         this.rules = rules
 
         this.id = 'nucleotide-select'
+        this._boundCloneHandler = this.handleClone.bind(this)
     }
 
     enter() {
-        this.want = this.rules.die.value
-        this.rules.instructions.querySelector('#select-number').innerHTML =
-            `${this.want}<sup>${ordinalSuffix(this.want)}</sup>`
+        this.cloneButtons = document.querySelectorAll(`#${this.id} .clone`)
+        this.cloneButtons.forEach(button => {
+            button.addEventListener('click', this._boundCloneHandler)
+            button.disabled = false
+        })
 
+        this.want = this.rules.die.value
         this.rules.currentGenome.onNucleotideSelectionChanged =
             this.handleSelectionChanged.bind(this)
+
         this.rules.currentGenome.unlock()
     }
 
     exit() {
         this.rules.currentGenome.lock()
+
+        this.cloneButtons.forEach(button => {
+            button.removeEventListener('click', this._boundCloneHandler)
+            button.disabled = true
+        })
+
         this.rules.currentGenome.onNucleotideSelectionChanged = undefined;
+    }
+
+    handleClone(evt) {
+        window.r = this.rules
+        console.debug('clone', this.rules.die.value, this.rules.currentGenome.length)
+        if (this.rules.die.value < this.rules.currentGenome.length) {
+            this.rules.error.innerHTML =
+                `TODO: this should have been a selection operation`
+            this.rules.next(new ShowError(this.rules, this))
+            return
+        }
+
+        this.rules.genomeList.push(this.rules.currentGenome.clone())
+        this.rules.next(new RollForNucleotide(this.rules))
     }
 
     handleSelectionChanged(nucleotide, i) {
         i++;
-        if (i != this.rules.die.value) {
+        if (this.rules.die.value > this.rules.currentGenome.length) {
+            this.rules.error.innerHTML =
+                `TODO: this should have been a clone operation`
+            this.rules.next(new ShowError(this.rules, this))
+            return
+        } else if (i != this.rules.die.value) {
             this.rules.error.innerHTML =
                 `You selected the ${i}<sup>${ordinalSuffix(i)}</sup> nucleotide. Please select the ${this.want}<sup>${ordinalSuffix(this.want)}</sup> one.`
             this.rules.next(new ShowError(this.rules, this))
@@ -245,12 +238,9 @@ class MarkAsLethal {
     }
 
     enter() {
-        this.rules.lethalitySelector.onItemSelected = this.handleItemSelected.bind(this)
-        this.rules.lethalitySelector.attach()
     }
 
     exit() {
-        this.rules.lethalitySelector.detach()
     }
 
     get lethalHTML() {
@@ -259,25 +249,6 @@ class MarkAsLethal {
     
     get nonLethalHTML() {
         return 'A change in amino acid is a <em>lethal</em> change.'
-    }
-    
-    handleItemSelected(isLethal) {
-        if (isLethal !== this.isLethal) {
-            if (this.isLethal) {
-                this.rules.error.innerHTML = this.lethalHTML
-            } else {
-                this.rules.error.innerHTML = this.nonLethalHTML
-            }
-            this.rules.next(new ShowError(this.rules, this))
-            return
-        }
-        
-        this.rules.iterations--
-        if (this.rules.isLastIteration) {
-            this.rules.next(new DoNothing(this.rules))
-        } else {
-            this.rules.next(new CloneNucleotide(this.rules))
-        }
     }
 }
 
@@ -328,21 +299,19 @@ class ShowError {
 }
 
 class Rules {
-    constructor(die, instructions, genomeList, aminoAcidSelector, nucleotideSelector, lethalitySelector, cloneButton, remainingIterations, printButton, errors) {
+    constructor(die, instructions, genomeList, aminoAcidSelector, nucleotideSelector, remainingIterations, printButton, errors) {
         this.die = new Die(die)
         this.instructions = instructions
         this.genomeList = new GenomeList(genomeList)
         this.aminoAcidSelector = new AminoAcidSelector(aminoAcidSelector)
         this.nucleotideSelector = new NucleotideSelector(nucleotideSelector)
-        this.lethalitySelector = new LethalitySelector(lethalitySelector)
-        this.cloneButton = cloneButton
         this.remainingIterations = remainingIterations
         this.printButton = printButton
         this.error = new Error(errors)
 
         this.iterations = Rules.maxIterations
-        this.cloneButton.disabled = true
         this.genomeList.push(new Genome(Rules.initialGenomeBases))
+        this.genomeList.push(this.currentGenome.clone())
 
         if (false) {
             this._debugStartAtRollForMutation()
@@ -350,12 +319,12 @@ class Rules {
             this._debugStartAtPerformMutation(3)
         } else if (false) {
             this._debugStartAtSelectAminoAcid()
-        } else if (true) {
+        } else if (false) {
             this._debugStartAtSelectLethality()
         } else if (false) {
             this._debugStartWithError()
         } else {
-            this.currentState = new CloneNucleotide(this)
+            this.currentState = new RollForNucleotide(this)
         }
         this.enterState()
     }
@@ -373,19 +342,12 @@ class Rules {
     }
 
     _debugStartAtRollForMutation() {
-        this.genomeList.push(this.currentGenome.clone())
-
         this.currentState = new RollForMutation(this)
         const nucleotide = this.currentGenome.nucleotides[2]
         this.currentGenome.selectedNucleotide = nucleotide
     }
 
     _debugStartAtPerformMutation(n) {
-        // The semicolon below is necessary to prevent the array
-        // expansion below it from being understood as an index
-        // operation.
-        this.genomeList.push(this.currentGenome.clone());
-
         [...Array(n)].forEach(i => {
             const n = randomItem(this.currentGenome.nucleotides)
             n.value = randomItem(Nucleotide.bases)
@@ -401,8 +363,6 @@ class Rules {
     }
 
     _debugStartAtSelectAminoAcid() {
-        this.genomeList.push(this.currentGenome.clone())
-
         this.currentState = new SelectAminoAcid(this)
         this.die.value = 15
         const nucleotide = this.currentGenome.nucleotides[15]
@@ -411,8 +371,6 @@ class Rules {
     }
 
     _debugStartAtSelectLethality() {
-        this.genomeList.push(this.currentGenome.clone())
-
         this.currentState = new MarkAsLethal(this, true)
         this.die.value = 15
         const nucleotide = this.currentGenome.nucleotides[15]
@@ -422,7 +380,7 @@ class Rules {
     }
 
     _debugStartWithError() {
-        this.currentState = new ShowError(this, new CloneNucleotide(this))
+        this.currentState = new ShowError(this, new RollForNucleotide(this))
         this.error.innerHTML = 'test an error'
     }
 
