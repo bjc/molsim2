@@ -52,7 +52,7 @@ class RollForNucleotide {
     }
 
     handleDieRoll() {
-        if (this.rules.die.value > Rules.initialGenomeBases) {
+        if (this.rules.die.value > Rules.initialGenomeBases.length) {
             this.rules.iterations--
             if (this.rules.isLastIteration) {
                 this.rules.next(new DoNothing(this.rules))
