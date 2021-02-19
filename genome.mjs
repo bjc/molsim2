@@ -37,6 +37,10 @@ class Genome {
         return this._elt
     }
 
+    get nucleotides() {
+        return this.codons.flatMap(c => c.bases)
+    }
+
     get onNucleotideSelectionChanged() {
         if (this._onNucleotideSelectionChanged !== undefined) {
             return this._onNucleotideSelectionChanged
