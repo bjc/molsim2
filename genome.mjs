@@ -5,8 +5,6 @@ import { randomItem } from './utils.mjs'
 class Genome {
     constructor(nucleotides) {
         const codonList = document.createElement('ol')
-        this._boundNucleotideClickedHandler =
-            this.nucleotideClickedHandler.bind(this)
 
         this.codons = []
         let tmpCodon = []
@@ -20,7 +18,15 @@ class Genome {
             }
         })
         this.elt.appendChild(codonList)
+
         this.lock()
+        this._boundNucleotideClickedHandler =
+            this.nucleotideClickedHandler.bind(this)
+        this.codons.forEach(c => {
+            c.bases.forEach(b => {
+                b.onClick = this._boundNucleotideClickedHandler
+            })
+        })
     }
 
     get elt() {
@@ -31,15 +37,15 @@ class Genome {
         return this._elt
     }
 
-    get onSelectionChanged() {
-        if (this._onSelectionChanged !== undefined) {
-            return this._onSelectionChanged
+    get onNucleotideSelectionChanged() {
+        if (this._onNucleotideSelectionChanged !== undefined) {
+            return this._onNucleotideSelectionChanged
         }
         return () => {}
     }
 
-    set onSelectionChanged(fn) {
-        this._onSelectionChanged = fn
+    set onNucleotideSelectionChanged(fn) {
+        this._onNucleotideSelectionChanged = fn
     }
 
     lock() {
@@ -67,8 +73,16 @@ class Genome {
 	this._selectedNucleotide = nucleotide
 	this._selectedNucleotide.select()
 
-	const i = this.nucleotides.indexOf(this._selectedNucleotide)
-	this.onSelectionChanged(this._selectedNucleotide, i)
+        let i = 0
+        for (const c of this.codons) {
+            for (const b of c.bases) {
+                if (b === this._selectedNucleotide) {
+	            this.onNucleotideSelectionChanged(this._selectedNucleotide, i)
+                    return
+                }
+                i++
+            }
+        }
     }
 
     nucleotideClickedHandler(nucleotide) {

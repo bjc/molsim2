@@ -77,14 +77,14 @@ class NucleotideSelect {
         this.rules.instructions.querySelector('#select-number').innerHTML =
             `${this.want}<sup>${ordinalSuffix(this.want)}</sup>`
 
-        this.rules.currentGenome.onSelectionChanged =
+        this.rules.currentGenome.onNucleotideSelectionChanged =
             this.handleSelectionChanged.bind(this)
         this.rules.currentGenome.unlock()
     }
 
     exit() {
         this.rules.currentGenome.lock()
-        this.rules.currentGenome.onSelectionChanged = undefined;
+        this.rules.currentGenome.onNucleotideSelectionChanged = undefined;
     }
 
     handleSelectionChanged(nucleotide, i) {
