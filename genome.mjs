@@ -4,20 +4,17 @@ import { randomItem } from './utils.mjs'
 
 class Genome {
     constructor(nucleotides) {
-        const codonList = document.createElement('ol')
-
         this.codons = []
         let tmpCodon = []
         nucleotides.forEach(base => {
             tmpCodon.push(base)
             if (tmpCodon.length == 3) {
                 const c = new Codon(...tmpCodon)
-                codonList.appendChild(c.elt)
+                this.elt.appendChild(c.elt)
                 this.codons.push(c)
                 tmpCodon = []
             }
         })
-        this.elt.appendChild(codonList)
 
         this.lock()
         this._boundNucleotideClickedHandler =
@@ -31,7 +28,7 @@ class Genome {
 
     get elt() {
         if (this._elt === undefined) {
-            this._elt = document.createElement('li')
+            this._elt = document.createElement('ol')
             this._elt.classList.add('genome')
         }
         return this._elt

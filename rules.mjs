@@ -23,6 +23,8 @@ class RollForNucleotide {
 
     exit() {
         this.rules.die.disable()
+        // TODO: debugging
+        this.rules.die.value = 20
         this.rules.die.onChanged = undefined
     }
 
@@ -65,7 +67,6 @@ class NucleotideSelect {
     }
 
     handleClone(evt) {
-        window.r = this.rules
         if (this.rules.die.value <= this.rules.currentGenome.length) {
             this.rules.error.innerHTML =
                 `Select the ${this.ordinalFor(this.rules.die.value)} nucleotide.`
@@ -75,7 +76,7 @@ class NucleotideSelect {
 
         this.rules.iterations--
         if (this.rules.iterations === 0) {
-            this.rules.next(new PrintResults(this.rules))
+            this.rules.next(new PrintResults(this.rules, this.rules.currentGenome.clone()))
         } else {
             this.rules.genomeList.push(this.rules.currentGenome.clone())
             this.rules.next(new RollForNucleotide(this.rules))
@@ -203,7 +204,6 @@ class SelectAminoAcid {
     }
 
     enter() {
-        window.t = this
         const selector = this.rules.aminoAcidSelector
         this.codon = this.rules.currentGenome.selectedCodon
         this.expected = AminoAcid.codonMap[this.codon.value]
@@ -228,7 +228,7 @@ class SelectAminoAcid {
     handleItemSelected(aminoAcid) {
         if (!this.validSelection(aminoAcid)) {
             this.rules.error.innerHTML =
-                `The codon ${this.codon.value} does not code for ${aminoAcid}`
+                `The codon <strong>${this.codon.value}</strong> does not code for <strong>${aminoAcid}</strong>`
             this.rules.next(new ShowError(this.rules, this))
             return
         }
@@ -304,7 +304,7 @@ class MarkAsLethal {
     nextGoodState(genome) {
         this.rules.iterations--
         if (this.rules.iterations === 0) {
-            this.rules.next(new PrintResults(this.rules))
+            this.rules.next(new PrintResults(this.rules, genome.clone()))
         } else {
             this.rules.genomeList.push(genome.clone())
             this.rules.next(new RollForNucleotide(this.rules))
@@ -313,14 +313,16 @@ class MarkAsLethal {
 }
 
 class PrintResults {
-    constructor(rules) {
+    constructor(rules, finalGenome) {
         this.rules = rules
+        this.finalGenome = finalGenome
 
         this.id = 'print-results'
         this._boundClickHandler = this.clickHandler.bind(this)
     }
 
     enter() {
+        this.rules.genomeList.finalGenome = this.finalGenome
         this.rules.printButton.addEventListener('click', this._boundClickHandler)
         this.rules.printButton.disabled = false
     }
@@ -370,9 +372,12 @@ class Rules {
         this.error = new Error(errors)
 
         this.iterations = Rules.maxIterations
-        this.genomeList.push(new Genome(Rules.initialGenomeBases))
-        this.genomeList.push(this.currentGenome.clone())
 
+        const initialGenome = new Genome(Rules.initialGenomeBases)
+        this.genomeList.initialGenome = initialGenome
+        this.genomeList.push(initialGenome.clone())
+
+        // TODO: debugging
         if (false) {
             this._debugStartAtRollForMutation()
         } else if (false) {
@@ -483,7 +488,7 @@ class Rules {
         this.enterState()
     }
 }
-Rules.maxIterations = 10
+Rules.maxIterations = 3
 Rules.initialGenomeBases = [
     'G', 'C', 'A',
     'C', 'T', 'C',

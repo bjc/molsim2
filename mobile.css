@@ -1,10 +1,16 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
 body {
     display: flex;
+    flex-wrap: nowrap;
     flex-direction: column;
     align-items: stretch;
     margin: 0;
 
-    background-color: #eee;
+    background-color: #ddd;
 
     position: absolute;
     top: 0;
@@ -35,11 +41,70 @@ body {
     margin-bottom: 5px;
 }
 
-#genome-history {
+#genome-list {
     margin: 0;
     overflow: scroll;
     align-self: stretch;
     flex-basis: 50%;
+}
+
+#genome-list .initial,
+#genome-list .history,
+#genome-list .final {
+    padding-left: 2.5em;
+}
+
+#genome-list .initial {
+    border-bottom: 1px dashed black;
+}
+
+#genome-list .history {
+    background-color: #eee;
+}
+
+#genome-list .final {
+    border-top: 1px dashed black;
+}
+
+.genome {
+    padding: 0;
+}
+
+.genome.locked {
+    cursor: text
+}
+
+.genome .codon {
+    display: inline-block;
+    margin: 5px;
+    border: 1px solid black;
+
+    background-color: white;
+}
+
+.genome .codon>ol {
+    padding: 1ex 0.5em;
+}
+
+.genome .codon .amino-acid {
+    border-top: 1px solid black;
+    text-align: center;
+    padding-top: 0.5ex;
+    padding-bottom: 0.5ex;
+}
+
+.genome .nucleotide {
+    display: inline-block;
+    width: 28px;
+    font-size: 18px;
+    text-align: center;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.genome .nucleotide span {
+    display: inline-block;
 }
 
 #instructions {
@@ -55,6 +120,11 @@ body {
     border-left-width: 0;
     border-right-width: 0;
     border-bottom-width: 0;
+}
+
+#instructions ol,
+#instructions ul {
+    padding-left: 2.5em;
 }
 
 #instructions .step {
@@ -182,45 +252,4 @@ body {
     padding: 10px;
     background-color: ivory;
     border: 1px solid black;
-}
-
-.genome>ol {
-    padding: 0;
-}
-
-.genome.locked {
-    cursor: text
-}
-
-.genome .codon {
-    display: inline-block;
-    margin: 5px;
-    border: 1px solid black;
-
-    background-color: white;
-}
-
-.genome .codon>ol {
-    padding: 1ex 0.5em;
-}
-
-.genome .codon .amino-acid {
-    border-top: 1px solid black;
-    text-align: center;
-    padding-top: 0.5ex;
-    padding-bottom: 0.5ex;
-}
-
-.genome .nucleotide {
-    display: inline-block;
-    width: 28px;
-    font-size: 18px;
-    text-align: center;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.genome .nucleotide span {
-    display: inline-block;
 }

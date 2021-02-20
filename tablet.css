@@ -18,6 +18,6 @@ body {
     display: block;
 }
 
-#genome-history {
+#genome-list {
     flex-grow: 4;
 }

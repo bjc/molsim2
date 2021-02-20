@@ -1,7 +1,7 @@
 import Rules from './rules.mjs'
 
 function init() {
-    const genomeList = document.querySelector('#genome-history')
+    const genomeList = document.querySelector('#genome-list')
     const die = document.querySelector('#die')
     const aminoAcidSelector = document.querySelector('#amino-acid-selector')
     const nucleotideSelector = document.querySelector('#nucleotide-selector')
