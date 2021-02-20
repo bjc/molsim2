@@ -52,10 +52,6 @@ body {
     border: 1px solid black;
 }
 
-.genome .codon>ol {
-    padding: 1ex 0.5em;
-}
-
 .genome .codon .amino-acid {
     border-top: 1px solid black;
     text-align: center;
@@ -65,7 +61,7 @@ body {
 
 .genome .nucleotide {
     display: inline-flex;
-    height: 3ex;
+    height: 2em;
     width: 2em;
     justify-content: space-around;
     align-items: center;
