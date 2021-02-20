@@ -85,7 +85,7 @@ class NucleotideSelect {
         if (this.rules.die.value > this.rules.currentGenome.length) {
             this.rules.currentGenome.selectedNucleotide = undefined
             this.rules.next(new ShowError(this.rules, this,
-                                          `You need to <em>clone</em> this nucleotide.`))
+                                          `You need to <em>clone</em> this genome.`))
             return
         } else if (i != this.rules.die.value) {
             this.rules.currentGenome.selectedNucleotide = undefined
