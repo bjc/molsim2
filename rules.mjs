@@ -416,10 +416,11 @@ class Rules {
             const g = this.currentGenome.clone()
             this.genomeList.push(g)
         })
+        this.iterations -= n
 
         this.currentState = new PerformMutation(this)
-        this.die.value = 18
-        const nucleotide = this.currentGenome.nucleotides[this.die.value-1]
+        this.die.value = 14
+        const nucleotide = this.currentGenome.nucleotides[17]
         this.currentGenome.selectedNucleotide = nucleotide
     }
 
@@ -484,7 +485,7 @@ class Rules {
         this.enterState()
     }
 }
-Rules.maxIterations = 3
+Rules.maxIterations = 10
 Rules.initialGenomeBases = [
     'G', 'C', 'A',
     'C', 'T', 'C',
