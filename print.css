@@ -23,11 +23,44 @@ body {
     display: none;
 }
 
-.genome>ol {
+#genome-list {
+    width: 100%;
+}
+
+#genome-list .initial,
+#genome-list .history,
+#genome-list .final {
+    padding-left: 2.5em;
+}
+
+#genome-list .initial {
+    border-bottom: 1px dashed black;
+}
+
+#genome-list .final {
+    border-top: 1px dashed black;
+}
+
+.genome {
     display: inline-flex;
     flex-wrap: wrap;
-    padding: 0;
-    margin: 1ex;
+}
+
+.genome .codon {
+    display: inline-block;
+    margin: 0.5ex;
+    border: 1px solid black;
+}
+
+.genome .codon>ol {
+    padding: 1ex 0.5em;
+}
+
+.genome .codon .amino-acid {
+    border-top: 1px solid black;
+    text-align: center;
+    padding-top: 0.5ex;
+    padding-bottom: 0.5ex;
 }
 
 .genome .nucleotide {

@@ -1,14 +1,8 @@
-* {
-    padding: 0;
-    margin: 0;
-}
-
 body {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: column;
     align-items: stretch;
-    margin: 0;
 
     background-color: #ddd;
 
@@ -31,7 +25,6 @@ body {
 
 #errors p {
     padding: 1ex 1em;
-    margin: 0;
 }
 
 #errors button {
@@ -42,7 +35,6 @@ body {
 }
 
 #genome-list {
-    margin: 0;
     overflow: scroll;
     align-self: stretch;
     flex-basis: 50%;
@@ -64,10 +56,6 @@ body {
 
 #genome-list .final {
     border-top: 1px dashed black;
-}
-
-.genome {
-    padding: 0;
 }
 
 .genome.locked {
@@ -109,7 +97,6 @@ body {
 
 #instructions {
     padding: 1ex;
-    margin: 0;
     overflow: scroll;
     flex-basis: 50%;
 
@@ -164,7 +151,6 @@ body {
 #nucleotide-selector {
     position: relative;
     white-space: nowrap;
-    padding: 0;
     word-spacing: -6px; /* TODO: 0 doesn't work. And for some reason whitespace is being renderded between <li> elements? */
     width: 8em; /* TODO: this shouldn't be hard coded. */
 
@@ -195,7 +181,6 @@ body {
 }
 
 #amino-acid-selector p {
-    margin: 0;
     padding: 10px;
 
     border-bottom: 1px dashed black;
@@ -209,7 +194,6 @@ body {
     display: flex;
     flex-wrap: wrap;
 
-    margin: 0;
     padding: 10px;
 
     list-style-type: none;
