@@ -376,11 +376,11 @@ class Rules {
         // TODO: debugging
         if (false) {
             this._debugStartAtRollForMutation()
-        } else if (false) {
-            this._debugStartAtPerformMutation(3)
+        } else if (true) {
+            this._debugStartAtPerformMutation(9)
         } else if (false) {
             this._debugStartAtSelectAminoAcid()
-        } else if (true) {
+        } else if (false) {
             this._debugStartAtSelectLethality()
         } else if (false) {
             this._debugStartWithError()
@@ -418,8 +418,8 @@ class Rules {
         })
 
         this.currentState = new PerformMutation(this)
-        this.die.value = 15
-        const nucleotide = this.currentGenome.nucleotides[15]
+        this.die.value = 18
+        const nucleotide = this.currentGenome.nucleotides[this.die.value-1]
         this.currentGenome.selectedNucleotide = nucleotide
     }
 

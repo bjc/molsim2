@@ -75,6 +75,10 @@ button {
     background-color: white;
 }
 
+.genome .codon>ol {
+    display: flex;
+}
+
 .genome .codon .amino-acid {
     border-top: 1px solid black;
     text-align: center;
@@ -87,14 +91,17 @@ button {
     height: 32px;
     width: 32px;
     font-size: 18px;
-    text-align: center;
     flex-wrap: wrap;
     justify-content: space-around;
     align-items: center;
 }
 
 .genome .nucleotide span {
-    display: inline-block;
+    display: inline-flex;
+    height: 32px;
+    width: 32px;
+    justify-content: space-around;
+    align-items: center;
 }
 
 #instructions {
@@ -152,10 +159,8 @@ button {
 
 #nucleotide-selector {
     position: relative;
+    display: flex;
     white-space: nowrap;
-    word-spacing: -6px; /* TODO: 0 doesn't work. And for some reason whitespace is being renderded between <li> elements? */
-    width: 8em; /* TODO: this shouldn't be hard coded. */
-
     background-color: ivory;
     border: 1px solid black;
 }
@@ -163,6 +168,15 @@ button {
 #nucleotide-selector,
 .genome:not(.locked) {
     cursor: pointer;
+}
+
+#nucleotide-selector li {
+    display: inline-flex;
+    height: 32px;
+    width: 32px;
+    font-size: 18px;
+    justify-content: space-around;
+    align-items: center;
 }
 
 #nucleotide-selector li:hover,
@@ -218,15 +232,6 @@ button {
 .genome .nucleotide.selected,
 .genome:not(.locked) .nucleotide.selected:hover {
     background-color: red;
-}
-
-#nucleotide-selector li {
-    display: inline-block;
-    width: 2em;
-    flex-basis: 2em;
-    text-align: center;
-    padding-top: 1ex;
-    padding-bottom: 1ex;
 }
 
 #lethality-selector {
