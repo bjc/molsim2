@@ -23,8 +23,6 @@ class RollForNucleotide {
 
     exit() {
         this.rules.die.disable()
-        // TODO: debugging
-        this.rules.die.value = 20
         this.rules.die.onChanged = undefined
     }
 
@@ -373,10 +371,9 @@ class Rules {
         this.genomeList.initialGenome = initialGenome
         this.genomeList.push(initialGenome.clone())
 
-        // TODO: debugging
         if (false) {
             this._debugStartAtRollForMutation()
-        } else if (true) {
+        } else if (false) {
             this._debugStartAtPerformMutation(9)
         } else if (false) {
             this._debugStartAtSelectAminoAcid()
