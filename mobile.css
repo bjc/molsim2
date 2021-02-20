@@ -75,10 +75,6 @@ button {
     background-color: white;
 }
 
-/* .genome .codon>ol { */
-/*     padding: 1ex 0.5em; */
-/* } */
-
 .genome .codon .amino-acid {
     border-top: 1px solid black;
     text-align: center;
