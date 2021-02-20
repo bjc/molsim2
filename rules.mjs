@@ -68,9 +68,8 @@ class NucleotideSelect {
 
     handleClone(evt) {
         if (this.rules.die.value <= this.rules.currentGenome.length) {
-            this.rules.error.innerHTML =
-                `Select the ${this.ordinalFor(this.rules.die.value)} nucleotide.`
-            this.rules.next(new ShowError(this.rules, this))
+            this.rules.next(new ShowError(this.rules, this,
+                                          `Select the ${this.ordinalFor(this.rules.die.value)} nucleotide.`))
             return
         }
 
@@ -86,14 +85,14 @@ class NucleotideSelect {
     handleSelectionChanged(nucleotide, i) {
         i++;
         if (this.rules.die.value > this.rules.currentGenome.length) {
-            this.rules.error.innerHTML =
-                `You need to <em>clone</em> this nucleotide.`
-            this.rules.next(new ShowError(this.rules, this))
+            this.rules.currentGenome.selectedNucleotide = undefined
+            this.rules.next(new ShowError(this.rules, this,
+                                          `You need to <em>clone</em> this nucleotide.`))
             return
         } else if (i != this.rules.die.value) {
-            this.rules.error.innerHTML =
-                `You selected the ${this.ordinalFor(i)} nucleotide. Please select the ${this.ordinalFor(this.want)} one.`
-            this.rules.next(new ShowError(this.rules, this))
+            this.rules.currentGenome.selectedNucleotide = undefined
+            this.rules.next(new ShowError(this.rules, this,
+                                          `You selected the ${this.ordinalFor(i)} nucleotide. Please select the ${this.ordinalFor(this.want)} one.`))
             return
         }
         this.rules.next(new RollForMutation(this.rules))
@@ -185,8 +184,7 @@ class PerformMutation {
 
     handleItemSelected(base) {
         if (!this.validMutation(this.selectedNucleotide.value, base)) {
-            this.rules.error.innerHTML = this.errorHTML
-            this.rules.next(new ShowError(this.rules, this))
+            this.rules.next(new ShowError(this.rules, this, this.errorHTML))
             return
         }
 
@@ -227,9 +225,8 @@ class SelectAminoAcid {
 
     handleItemSelected(aminoAcid) {
         if (!this.validSelection(aminoAcid)) {
-            this.rules.error.innerHTML =
-                `The codon <strong>${this.codon.value}</strong> does not code for <strong>${aminoAcid}</strong>`
-            this.rules.next(new ShowError(this.rules, this))
+            this.rules.next(new ShowError(this.rules, this,
+                                          `The codon <strong>${this.codon.value}</strong> does not code for <strong>${aminoAcid}</strong>`))
             return
         }
 
@@ -285,8 +282,7 @@ class MarkAsLethal {
 
     handleClone(evt) {
         if (this.isLethal) {
-            this.rules.error.innerHTML = this.lethalHTML
-            this.rules.next(new ShowError(this.rules, this))
+            this.rules.next(new ShowError(this.rules, this, this.lethalHTML))
             return
         }
         this.nextGoodState(this.rules.currentGenome)
@@ -294,8 +290,7 @@ class MarkAsLethal {
 
     handleKill(evt) {
         if (!this.isLethal) {
-            this.rules.error.innerHTML = this.nonLethalHTML
-            this.rules.next(new ShowError(this.rules, this))
+            this.rules.next(new ShowError(this.rules, this, this.nonLethalHTML))
             return
         }
         this.nextGoodState(this.originalGenome)
@@ -338,9 +333,10 @@ class PrintResults {
 }
 
 class ShowError {
-    constructor(rules, nextState) {
+    constructor(rules, nextState, message) {
         this.rules = rules
         this.nextState = nextState
+        this.rules.error.innerHTML = message
 
         this._boundClickHandler = this.clickHandler.bind(this)
     }
@@ -445,8 +441,8 @@ class Rules {
     }
 
     _debugStartWithError() {
-        this.currentState = new ShowError(this, new RollForNucleotide(this))
-        this.error.innerHTML = 'test an error'
+        this.currentState = new ShowError(this, new RollForNucleotide(this),
+                                          'test an error')
     }
 
     get currentGenome() {

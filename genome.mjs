@@ -80,8 +80,12 @@ class Genome {
 	    this.selectedNucleotide.deselect()
 	}
 	this._selectedNucleotide = nucleotide
-	this._selectedNucleotide.select()
 
+        if (nucleotide === undefined) {
+            return
+        }
+
+	this._selectedNucleotide.select()
         let i = 0
         for (const c of this.codons) {
             for (const b of c.bases) {
