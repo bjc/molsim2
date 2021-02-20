@@ -75,9 +75,9 @@ button {
     background-color: white;
 }
 
-.genome .codon>ol {
-    padding: 1ex 0.5em;
-}
+/* .genome .codon>ol { */
+/*     padding: 1ex 0.5em; */
+/* } */
 
 .genome .codon .amino-acid {
     border-top: 1px solid black;
@@ -87,8 +87,9 @@ button {
 }
 
 .genome .nucleotide {
-    display: inline-block;
-    width: 28px;
+    display: inline-flex;
+    height: 32px;
+    width: 32px;
     font-size: 18px;
     text-align: center;
     flex-wrap: wrap;
